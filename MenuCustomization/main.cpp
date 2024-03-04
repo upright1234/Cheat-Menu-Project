@@ -5,10 +5,12 @@
 #include <d3d11.h>
 #include <shlobj.h>
 #include  <io.h>
+#include  <fstream>
 #include "Imgui/imgui.h"
 #include "Imgui/imgui_impl_dx11.h"
 #include "Imgui/imgui_impl_win32.h"
-#include "CheatSettings.h"
+#include "CheatSettings/CheatSettings.h"
+#include "CheatSettings/Config.h"
 #pragma comment(lib,"Urlmon.lib")
 
 bool FileExists(const std::string& Filename)
@@ -111,7 +113,8 @@ void LoadKeys(ImGuiIO& io) {
 
 bool init = true;
 bool EnableEsp = true;
-void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHeight, SETTINGS* Settings)
+char cfgname[30] = "NewSetting";
+void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHeight, SETTINGS* Settings, CConfig* g_pConfig)
 {
 	if (!(*ShowMenu))
 		return;
@@ -170,6 +173,37 @@ void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHei
 			ImGui::BeginGroup();
 			{
 				ImGui::Checkbox("Enable ESP", &Settings->Visuals.Players.Enable);
+				ImGui::Spacing();
+				ImGui::Spacing();
+				ImGui::Text("Select Your Config:");
+				ImGui::Spacing();
+				ImGui::Spacing();
+				if (ImGui::Combo("##Config", &Settings->iConfig, g_pConfig->szConfigs.c_str()))
+				{
+					if (Settings->oldiConfig != Settings->iConfig)
+					{
+						g_pConfig->InitPath(&g_pConfig->vecConfigs[Settings->oldiConfig][0u]);
+						g_pConfig->Save();
+						Settings->oldiConfig = Settings->iConfig;
+						g_pConfig->InitPath(&g_pConfig->vecConfigs[Settings->iConfig][0u]);
+						g_pConfig->Read();
+					}
+				}
+
+				ImGui::Text("New Config:");
+				ImGui::InputText("Config Name", cfgname, 30);
+				if (ImGui::Button("Add Config") && strlen(cfgname) > 2)
+				{
+					std::string cfstring = cfgname;
+					std::string name = g_pConfig->pathname + "\\";
+					std::string cfgpath = name + cfstring;
+					std::ofstream outfile(cfgpath);
+					outfile << " " << std::endl;
+					outfile.close();
+					g_pConfig->ParseConfigs();
+					g_pConfig->InitPath((char*)cfstring.c_str());
+					g_pConfig->Save();
+				}
 			}
 			ImGui::EndGroup();
 		}

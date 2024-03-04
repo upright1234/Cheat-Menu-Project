@@ -171,7 +171,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CheatSettings.h" />
+    <ClInclude Include="CheatSettings\CheatSettings.h" />
+    <ClInclude Include="CheatSettings\Config.h" />
     <ClInclude Include="Imgui\imconfig.h" />
     <ClInclude Include="Imgui\imgui.h" />
     <ClInclude Include="Imgui\imgui_impl_dx11.h" />
@@ -181,6 +182,13 @@
     <ClInclude Include="Imgui\imstb_textedit.h" />
     <ClInclude Include="Imgui\imstb_truetype.h" />
     <ClInclude Include="Imgui\stb_image.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CheatSettings\ApexCheatSettings.txt" />
+    <Text Include="CheatSettings\FortniteCheatSettings.txt" />
+    <Text Include="CheatSettings\MW3CheatSettings.txt" />
+    <Text Include="CheatSettings\RustCheatSettings.txt" />
+    <Text Include="CheatSettings\ValorantCheatSettings.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

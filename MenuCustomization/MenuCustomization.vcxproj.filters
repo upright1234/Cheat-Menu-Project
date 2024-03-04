@@ -16,6 +16,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{18b15c31-4caa-4150-b30a-5918f1d1390c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Arquivos de Cabeçalho\OtherSettings">
+      <UniqueIdentifier>{c3d426ae-695f-494b-995d-6ef29e7c5a24}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -71,8 +74,28 @@
     <ClInclude Include="Imgui\stb_image.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="CheatSettings.h">
-      <Filter>Arquivos de Origem</Filter>
+    <ClInclude Include="CheatSettings\CheatSettings.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="CheatSettings\Config.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CheatSettings\ApexCheatSettings.txt">
+      <Filter>Arquivos de Cabeçalho\OtherSettings</Filter>
+    </Text>
+    <Text Include="CheatSettings\FortniteCheatSettings.txt">
+      <Filter>Arquivos de Cabeçalho\OtherSettings</Filter>
+    </Text>
+    <Text Include="CheatSettings\MW3CheatSettings.txt">
+      <Filter>Arquivos de Cabeçalho\OtherSettings</Filter>
+    </Text>
+    <Text Include="CheatSettings\RustCheatSettings.txt">
+      <Filter>Arquivos de Cabeçalho\OtherSettings</Filter>
+    </Text>
+    <Text Include="CheatSettings\ValorantCheatSettings.txt">
+      <Filter>Arquivos de Cabeçalho\OtherSettings</Filter>
+    </Text>
   </ItemGroup>
 </Project>
