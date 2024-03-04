@@ -86,6 +86,29 @@ bool InitializeMenu(HWND Window, ID3D11Device* g_pd3dDevice, ID3D11DeviceContext
 		return false;
 }
 
+void LoadKeys(ImGuiIO& io) {
+	bool isShift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) || (GetAsyncKeyState(VK_LSHIFT) & 0x8000) || (GetAsyncKeyState(VK_RSHIFT) & 0x8000);
+	bool isCaps = GetKeyState(0x14);
+	for (int i = '0'; i < '9'; i++) {
+		if (GetAsyncKeyState(i) & 1) {
+			io.AddInputCharacter(i);
+		}
+	}
+	for (int i = 'A'; i < 'Z'; i++) {
+		if (GetAsyncKeyState(i) & 1) {
+			if (isCaps && !isShift) {
+				io.AddInputCharacter(i);
+			}
+			else if (isShift && !isCaps) {
+				io.AddInputCharacter(i);
+			}
+			else {
+				io.AddInputCharacter(i + 32);
+			}
+		}
+	}
+}
+
 bool init = true;
 bool EnableEsp = true;
 void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHeight, SETTINGS* Settings)
@@ -96,6 +119,35 @@ void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHei
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+
+	ImGuiIO& io = ImGui::GetIO();
+
+	io.MouseDown[0] = GetAsyncKeyState(VK_LBUTTON) & 0x8000;
+	io.MouseDown[1] = GetAsyncKeyState(VK_RBUTTON) & 0x8000;
+	io.MouseDown[2] = GetAsyncKeyState(VK_MBUTTON) & 0x8000;
+	io.MouseDown[3] = GetAsyncKeyState(VK_XBUTTON1) & 0x8000;
+	io.MouseDown[4] = GetAsyncKeyState(VK_XBUTTON2) & 0x8000;
+
+	for (int i = 0; i < 512; i++) {
+		auto key = ImGui_ImplWin32_VirtualKeyToImGuiKey(i);
+		if (key != ImGuiKey_None) {
+			io.AddKeyEvent(key, (GetKeyState(i) & 0x8000) != 0);
+		}
+	}
+	LoadKeys(io);
+
+	if ((GetKeyState(VK_LEFT) & 0x8000) != 0) {
+		io.MouseWheelH = +0.2;
+	}
+	if ((GetKeyState(VK_RIGHT) & 0x8000) != 0) {
+		io.MouseWheelH = -0.2;
+	}
+	if ((GetKeyState(VK_UP) & 0x8000) != 0) {
+		io.MouseWheel = +0.2;
+	}
+	if ((GetKeyState(VK_DOWN) & 0x8000) != 0) {
+		io.MouseWheel = -0.2;
+	}
 
 	ImGui::SetNextWindowBgAlpha(0.f);
 	ImGui::SetNextWindowPos({ (float)GameX, (float)GameY }, ImGuiCond_Always);
