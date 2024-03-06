@@ -8,8 +8,8 @@ struct CConfig {
     std::vector<std::string> vecConfigs;
     std::string pathname;
 
-    void InitPath(char* config_name = NULL);
-    void Read();
-    void Save();
-    void ParseConfigs();
+    virtual void InitPath(char* config_name = NULL);
+    virtual void Read();
+    virtual void Save();
+    virtual void ParseConfigs();
 };
