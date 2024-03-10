@@ -31,7 +31,7 @@ struct SETTINGS {
         int MaxDistance = 600;
     }Aim;
 
-    AimStruct aimbot[9];
+    AimStruct aimbot[11];
 
     struct {
         bool TriggerBot = true;
