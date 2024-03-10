@@ -13,6 +13,9 @@
 #include "CheatSettings/Config.h"
 #pragma comment(lib,"Urlmon.lib")
 
+bool init = true;
+char cfgname[30] = "NewSetting";
+
 bool FileExists(const std::string& Filename)
 {
 	return _access_s(Filename.c_str(), 04) == 0;
@@ -41,6 +44,55 @@ const ImWchar* GetGlyphRangesChinese()
 		0,
 	};
 	return &ranges[0];
+}
+
+void LoadKeys(ImGuiIO& io) {
+	io.MouseDown[0] = GetAsyncKeyState(VK_LBUTTON) & 0x8000;
+	io.MouseDown[1] = GetAsyncKeyState(VK_RBUTTON) & 0x8000;
+	io.MouseDown[2] = GetAsyncKeyState(VK_MBUTTON) & 0x8000;
+	io.MouseDown[3] = GetAsyncKeyState(VK_XBUTTON1) & 0x8000;
+	io.MouseDown[4] = GetAsyncKeyState(VK_XBUTTON2) & 0x8000;
+
+	for (int i = 0; i < 512; i++) {
+		auto key = ImGui_ImplWin32_VirtualKeyToImGuiKey(i);
+		if (key != ImGuiKey_None) {
+			io.AddKeyEvent(key, (GetKeyState(i) & 0x8000) != 0);
+		}
+	}
+
+	bool isShift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) || (GetAsyncKeyState(VK_LSHIFT) & 0x8000) || (GetAsyncKeyState(VK_RSHIFT) & 0x8000);
+	bool isCaps = GetKeyState(0x14);
+	for (int i = '0'; i < '9'; i++) {
+		if (GetAsyncKeyState(i) & 1) {
+			io.AddInputCharacter(i);
+		}
+	}
+	for (int i = 'A'; i < 'Z'; i++) {
+		if (GetAsyncKeyState(i) & 1) {
+			if (isCaps && !isShift) {
+				io.AddInputCharacter(i);
+			}
+			else if (isShift && !isCaps) {
+				io.AddInputCharacter(i);
+			}
+			else {
+				io.AddInputCharacter(i + 32);
+			}
+		}
+	}
+
+	if ((GetKeyState(VK_LEFT) & 0x8000) != 0) {
+		io.MouseWheelH = +0.2;
+	}
+	if ((GetKeyState(VK_RIGHT) & 0x8000) != 0) {
+		io.MouseWheelH = -0.2;
+	}
+	if ((GetKeyState(VK_UP) & 0x8000) != 0) {
+		io.MouseWheel = +0.2;
+	}
+	if ((GetKeyState(VK_DOWN) & 0x8000) != 0) {
+		io.MouseWheel = -0.2;
+	}
 }
 
 bool InitializeMenu(HWND Window, ID3D11Device* g_pd3dDevice, ID3D11DeviceContext* g_pd3dDeviceContext) {
@@ -88,32 +140,6 @@ bool InitializeMenu(HWND Window, ID3D11Device* g_pd3dDevice, ID3D11DeviceContext
 		return false;
 }
 
-void LoadKeys(ImGuiIO& io) {
-	bool isShift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) || (GetAsyncKeyState(VK_LSHIFT) & 0x8000) || (GetAsyncKeyState(VK_RSHIFT) & 0x8000);
-	bool isCaps = GetKeyState(0x14);
-	for (int i = '0'; i < '9'; i++) {
-		if (GetAsyncKeyState(i) & 1) {
-			io.AddInputCharacter(i);
-		}
-	}
-	for (int i = 'A'; i < 'Z'; i++) {
-		if (GetAsyncKeyState(i) & 1) {
-			if (isCaps && !isShift) {
-				io.AddInputCharacter(i);
-			}
-			else if (isShift && !isCaps) {
-				io.AddInputCharacter(i);
-			}
-			else {
-				io.AddInputCharacter(i + 32);
-			}
-		}
-	}
-}
-
-bool init = true;
-bool EnableEsp = true;
-char cfgname[30] = "NewSetting";
 void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHeight, SETTINGS* Settings, CConfig* g_pConfig)
 {
 	if (!(*ShowMenu))
@@ -124,33 +150,7 @@ void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHei
 	ImGui::NewFrame();
 
 	ImGuiIO& io = ImGui::GetIO();
-
-	io.MouseDown[0] = GetAsyncKeyState(VK_LBUTTON) & 0x8000;
-	io.MouseDown[1] = GetAsyncKeyState(VK_RBUTTON) & 0x8000;
-	io.MouseDown[2] = GetAsyncKeyState(VK_MBUTTON) & 0x8000;
-	io.MouseDown[3] = GetAsyncKeyState(VK_XBUTTON1) & 0x8000;
-	io.MouseDown[4] = GetAsyncKeyState(VK_XBUTTON2) & 0x8000;
-
-	for (int i = 0; i < 512; i++) {
-		auto key = ImGui_ImplWin32_VirtualKeyToImGuiKey(i);
-		if (key != ImGuiKey_None) {
-			io.AddKeyEvent(key, (GetKeyState(i) & 0x8000) != 0);
-		}
-	}
 	LoadKeys(io);
-
-	if ((GetKeyState(VK_LEFT) & 0x8000) != 0) {
-		io.MouseWheelH = +0.2;
-	}
-	if ((GetKeyState(VK_RIGHT) & 0x8000) != 0) {
-		io.MouseWheelH = -0.2;
-	}
-	if ((GetKeyState(VK_UP) & 0x8000) != 0) {
-		io.MouseWheel = +0.2;
-	}
-	if ((GetKeyState(VK_DOWN) & 0x8000) != 0) {
-		io.MouseWheel = -0.2;
-	}
 
 	ImGui::SetNextWindowBgAlpha(0.f);
 	ImGui::SetNextWindowPos({ (float)GameX, (float)GameY }, ImGuiCond_Always);
@@ -162,9 +162,12 @@ void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHei
 		init = false;
 	}
 
+
+	//Put your menu here
 	ImGui::SetNextWindowSize(ImVec2(300, 300));
 	ImGui::Begin("Fortnite", ShowMenu, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBringToFrontOnFocus);
 	{
+
 		const auto& p = ImGui::GetWindowPos();
 		ImGui::BeginChild("Child0", ImVec2(300, 300), true);
 		{
@@ -172,12 +175,14 @@ void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHei
 			ImGui::SetCursorPos(ImVec2(15, 15));
 			ImGui::BeginGroup();
 			{
+
 				ImGui::Checkbox("Enable ESP", &Settings->Visuals.Players.Enable);
 				ImGui::Spacing();
 				ImGui::Spacing();
 				ImGui::Text("Select Your Config:");
 				ImGui::Spacing();
 				ImGui::Spacing();
+
 				if (ImGui::Combo("##Config", &Settings->iConfig, g_pConfig->szConfigs.c_str()))
 				{
 					if (Settings->oldiConfig != Settings->iConfig)
@@ -204,6 +209,7 @@ void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHei
 					g_pConfig->InitPath((char*)cfstring.c_str());
 					g_pConfig->Save();
 				}
+
 			}
 			ImGui::EndGroup();
 		}
