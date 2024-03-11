@@ -3,13 +3,17 @@
 #include <string>
 #include <vector>
 
+void InitPath(char* config_name = NULL);
+void Read();
+void Save();
+void ParseConfigs();
+
 struct CConfig {
+    decltype(&InitPath)(InitPath);
+    decltype(&Read)(Read);
+    decltype(&Save)(Save);
+    decltype(&ParseConfigs)(ParseConfigs);
     std::string szConfigs;
     std::vector<std::string> vecConfigs;
     std::string pathname;
-
-    virtual void InitPath(char* config_name = NULL);
-    virtual void Read();
-    virtual void Save();
-    virtual void ParseConfigs();
 };
