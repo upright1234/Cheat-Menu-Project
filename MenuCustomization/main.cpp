@@ -16,14 +16,18 @@
 
 bool init = true;
 
-void LoadKeys(ImGuiIO& io) {
+void LoadKeys() {
+
+	ImGuiIO& io = ImGui::GetIO();
+	(void)io;
+
 	io.MouseDown[0] = GetAsyncKeyState(VK_LBUTTON) & 0x8000;
 	io.MouseDown[1] = GetAsyncKeyState(VK_RBUTTON) & 0x8000;
 	io.MouseDown[2] = GetAsyncKeyState(VK_MBUTTON) & 0x8000;
 	io.MouseDown[3] = GetAsyncKeyState(VK_XBUTTON1) & 0x8000;
 	io.MouseDown[4] = GetAsyncKeyState(VK_XBUTTON2) & 0x8000;
 
-	for (int i = 0; i < 512; i++) {
+	for (auto i = 0x08; i <= 0xA5; i++) {
 		auto key = ImGui_ImplWin32_VirtualKeyToImGuiKey(i);
 		if (key != ImGuiKey_None) {
 			io.AddKeyEvent(key, (GetKeyState(i) & 0x8000) != 0);
@@ -82,15 +86,12 @@ bool InitializeMenu(HWND Window, ID3D11Device* g_pd3dDevice, ID3D11DeviceContext
 
 void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHeight, SETTINGS* Settings, CConfig* g_pConfig)
 {
-	if (!(*ShowMenu))
-		return;
-
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	ImGuiIO& io = ImGui::GetIO();
-	LoadKeys(io);
+	
+	LoadKeys();
 
 	ImGui::SetNextWindowBgAlpha(0.f);
 	ImGui::SetNextWindowPos({ (float)GameX, (float)GameY }, ImGuiCond_Always);
@@ -104,7 +105,8 @@ void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHei
 
 
 	//Put your menu here
-	RenderMyMenu(ShowMenu, Settings, g_pConfig);
+	if (*ShowMenu == true)
+		RenderMyMenu(ShowMenu, Settings, g_pConfig);
 
 	ImGui::End();
 	ImGui::EndFrame();

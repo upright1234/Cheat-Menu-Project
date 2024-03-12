@@ -1,20 +1,21 @@
 #pragma once
+#include <direct.h>
+#include <stdio.h>
 #include <Windows.h>
+#include <psapi.h>
+#include <intrin.h>
+#include <vector>
 
 struct SETTINGS {
-
     int iConfig = 0;
     int oldiConfig = 0;
-
     struct {
 
         bool Enable = true;
         bool SaveTarget = true;
-        bool RecoilControl = true;
-        bool AimLock = true;
+        bool AimLock = false;
         bool VisibilityCheck = true;
-        bool HumanizedSmooth = true;
-        bool IgnoreKnocked = true;
+        bool IgnoreKnocked = false;
 
         bool DrawFov = true;
         bool DrawCrossHair = true;
@@ -22,71 +23,48 @@ struct SETTINGS {
         int DrawTargetType = 0;
         float DrawThickness = 1.f;
 
-        bool Predict = true;
         int HitBox = 0;
 
-        int RecoilControlValue = 100;
         float FOV = 5.f;
-        float Smooth = 2.f;
-        float HumanizedSmoothPercent = 2.f;
+        float min_time = 0.1f;
+        float max_time = 0.7f;
         int MaxDistance = 600;
 
     }Aimbot;
 
     struct {
 
-        //bool SpectatorCount = true;
-        //bool RingHelper = true;
-        //bool Thirdperson = true;
-    }Misc;
-
-    struct {
         struct {
             bool Enable = false;
-            bool Text = false;
-
-            bool Glow = true;
 
             int MaxDistance = 150;
-            float FontSize = 12.f;
+            float FontSize = 15.f;
 
-            bool Weapon = true;
-            bool Deathbox = true;
-            bool Vehicle = true;
-            bool Ammo = true;
-            bool Attachment = true;
+            bool AssaultRifleAmmo = true;
+            bool PistolAmmo = true;
+            bool SMGAmmo = true;
+            bool ShotgunAmmo = true;
+            bool SniperAmmo = true;
+            bool RocketAmmo = true;
+
+            bool Cash = true;
+            bool Armor = true;
             bool Grenades = true;
-            bool Medicine = true;
 
-            bool Helmet = true;
-            bool Body = true;
-            bool Evo = true;
-            bool Knockdown = true;
-            int KnockdownType = 3;
-            bool Backpack = true;
-            int BackpackType = 3;
+            bool Crates = true;
+            bool Boxes = true;
+            bool Missions = true;
+            bool Perks = true;
+            bool Knifes = true;
+            bool Stim = true;
+            bool DMZ = true;
         }Items;
 
         struct {
             bool Enable = true;
-            bool IgnoreKnocked = true;
 
             int MaxDistance = 800;
             float FontSize = 16.f;
-
-            bool Glow = true;
-            int GlowType = 0;
-
-            bool HeadCircle = true;
-            bool OutScreen = true;
-            int OutScreenType = 1;
-            int OutScreenFov = 15;
-            float OutScreenThickness = 2.f;
-            int OutScreenSize = 10.f;
-
-            bool NickName = true;
-            bool Distance = true;
-            bool Weapon = true;
 
             bool Box = true;
             int BoxType = 0;
@@ -97,28 +75,33 @@ struct SETTINGS {
             float LinesThickness = 1.f;
 
             bool Health = true;
-            int HealthType = 1;
+            int HealthType = 0;
             float HealthThickness = 4.f;
 
-            bool Shield = true;
-            int ShieldType = 1;
-            float ShieldThickness = 4.f;
+            bool Skeleton = true;
+            float SkeletonThickness = 2.f;
 
-            bool Skeleton = false;
-            float SkeletonThickness = 1.f;
+            bool NickName = true;
+            bool Distance = true;
+            bool HeadCircle = true;
+
+            bool OutScreen = true;
+            int OutScreenType = 0;
+            int OutScreenFov = 15;
+            float OutScreenThickness = 2.f;
+            int OutScreenSize = 10.f;
+
         }Players;
 
         struct {
             bool Enable = true;
-            int MaxDistance = 800;
-            int PositionX = 10;
+            int PositionX = 40;
             int PositionY = 30;
-            int Zoom = 10;
             int Size = 200;
+            int Zoom = 1;
 
             bool VisibleColor = true;
-            bool ClosestColor = true;
-            int ClosestDistance = 100;
+            int MaxDistance = 150;
         }Radar;
     }Visuals;
 
@@ -127,12 +110,14 @@ struct SETTINGS {
         struct {
             int HoldPrimary = VK_LBUTTON;
             int HoldSecondary = VK_RBUTTON;
+
             int SwitchToHead = VK_SHIFT;
             int Toggle = VK_F6;
         }Aimbot;
 
         struct {
             int TogglePlayers = VK_F7;
+            int ToggleBots = VK_F7;
             int ToggleItems = VK_F8;
             int ToggleRadar = VK_F9;
         }Visuals;
@@ -151,21 +136,21 @@ struct SETTINGS {
         struct {
             float Visible[3] = { 1.f, 1.f, 1.f };
             float NonVisible[3] = { 1.f, 1.f, 1.f };
-            float GlowVisible[3] = { 0.62f, 0.05f, 0.05f };
-            float GlowNonVisible[3] = { 0.62f, 0.05f, 0.05f };
+            float NickName[3] = { 1.f, 1.f, 1.f };
+            float Distance[3] = { 1.f, 1.f, 1.f };
         }Players;
+
+        struct {
+            float Visible[3] = { 1.f, 1.f, 1.f };
+            float NonVisible[3] = { 1.f, 1.f, 1.f };
+            float NickName[3] = { 1.f, 1.f, 1.f };
+            float Distance[3] = { 1.f, 1.f, 1.f };
+        }Bots;
 
         struct {
             float Enemies[3] = { 1.f, 0.f, 0.f };
             float Visible[3] = { 0.f, 1.0f, 0.f };
-            float Closest[3] = { 1.f, 1.0f, 0.f };
         }Radar;
-
-        struct {
-            float Deathbox[3] = { 1.f, 0.f, 0.f };
-            float Vehicle[3] = { 1.f, 0.f, 0.f };
-            float Weapon[3] = { 1.f, 0.f, 0.f };
-        }Items;
 
     }Colors;
 
