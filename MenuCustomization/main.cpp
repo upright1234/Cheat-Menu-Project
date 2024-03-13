@@ -110,7 +110,7 @@ void LoadKeys() {
 	}
 }
 
-bool InitializeMenu(HWND Window, ID3D11Device* g_pd3dDevice, ID3D11DeviceContext* g_pd3dDeviceContext) {
+bool InitializeMenu(HWND Window, ID3D11Device* g_pd3dDevice, ID3D11DeviceContext* g_pd3dDeviceContext, int* ResellerMenuColor) {
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
