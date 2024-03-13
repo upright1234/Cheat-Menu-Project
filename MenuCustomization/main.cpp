@@ -27,25 +27,33 @@ void LoadController() {
 
 		// Map controller buttons
 		const WORD buttons = controllerState.Gamepad.wButtons;
-		io.NavInputs[ImGuiNavInput_Activate] = (buttons & XINPUT_GAMEPAD_A) ? 1.0f : 0.0f;
-		io.NavInputs[ImGuiNavInput_Cancel] = (buttons & XINPUT_GAMEPAD_B) ? 1.0f : 0.0f;
-		io.NavInputs[ImGuiNavInput_Menu] = (buttons & XINPUT_GAMEPAD_X) ? 1.0f : 0.0f;
-		io.NavInputs[ImGuiNavInput_Input] = (buttons & XINPUT_GAMEPAD_Y) ? 1.0f : 0.0f;
-
-		// Additional controller triggers
-		io.NavInputs[ImGuiNavInput_FocusPrev] = (buttons & XINPUT_GAMEPAD_LEFT_SHOULDER) ? 1.0f : 0.0f; // L1
-		io.NavInputs[ImGuiNavInput_FocusNext] = (buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER) ? 1.0f : 0.0f; // R1
-		float l2 = controllerState.Gamepad.bLeftTrigger / 255.0f;
-		float r2 = controllerState.Gamepad.bRightTrigger / 255.0f;
-
-		// Map controller sticks
-		float lx = controllerState.Gamepad.sThumbLX / 32767.0f;
-		float ly = controllerState.Gamepad.sThumbLY / 32767.0f;
-
-		io.NavInputs[ImGuiNavInput_LStickLeft] = (lx < -0.3f) ? -lx : 0.0f;
-		io.NavInputs[ImGuiNavInput_LStickRight] = (lx > 0.3f) ? lx : 0.0f;
-		io.NavInputs[ImGuiNavInput_LStickUp] = (ly > 0.3f) ? ly : 0.0f;
-		io.NavInputs[ImGuiNavInput_LStickDown] = (ly < -0.3f) ? -ly : 0.0f;
+#define IM_SATURATE(V)                      (V < 0.0f ? 0.0f : V > 1.0f ? 1.0f : V)
+#define MAP_BUTTON(KEY_NO, BUTTON_ENUM)     { io.AddKeyEvent(KEY_NO, (buttons & BUTTON_ENUM) != 0); }
+#define MAP_ANALOG(KEY_NO, VALUE, V0, V1)   { float vn = (float)(VALUE - V0) / (float)(V1 - V0); io.AddKeyAnalogEvent(KEY_NO, vn > 0.10f, IM_SATURATE(vn)); }
+		MAP_BUTTON(ImGuiKey_GamepadStart, XINPUT_GAMEPAD_START);
+		MAP_BUTTON(ImGuiKey_GamepadBack, XINPUT_GAMEPAD_BACK);
+		MAP_BUTTON(ImGuiKey_GamepadFaceLeft, XINPUT_GAMEPAD_X);
+		MAP_BUTTON(ImGuiKey_GamepadFaceRight, XINPUT_GAMEPAD_B);
+		MAP_BUTTON(ImGuiKey_GamepadFaceUp, XINPUT_GAMEPAD_Y);
+		MAP_BUTTON(ImGuiKey_GamepadFaceDown, XINPUT_GAMEPAD_A);
+		MAP_BUTTON(ImGuiKey_GamepadDpadLeft, XINPUT_GAMEPAD_DPAD_LEFT);
+		MAP_BUTTON(ImGuiKey_GamepadDpadRight, XINPUT_GAMEPAD_DPAD_RIGHT);
+		MAP_BUTTON(ImGuiKey_GamepadDpadUp, XINPUT_GAMEPAD_DPAD_UP);
+		MAP_BUTTON(ImGuiKey_GamepadDpadDown, XINPUT_GAMEPAD_DPAD_DOWN);
+		MAP_BUTTON(ImGuiKey_GamepadL1, XINPUT_GAMEPAD_LEFT_SHOULDER);
+		MAP_BUTTON(ImGuiKey_GamepadR1, XINPUT_GAMEPAD_RIGHT_SHOULDER);
+		MAP_ANALOG(ImGuiKey_GamepadL2, controllerState.Gamepad.bLeftTrigger, XINPUT_GAMEPAD_TRIGGER_THRESHOLD, 255);
+		MAP_ANALOG(ImGuiKey_GamepadR2, controllerState.Gamepad.bRightTrigger, XINPUT_GAMEPAD_TRIGGER_THRESHOLD, 255);
+		MAP_BUTTON(ImGuiKey_GamepadL3, XINPUT_GAMEPAD_LEFT_THUMB);
+		MAP_BUTTON(ImGuiKey_GamepadR3, XINPUT_GAMEPAD_RIGHT_THUMB);
+		MAP_ANALOG(ImGuiKey_GamepadLStickLeft, controllerState.Gamepad.sThumbLX, -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, -32768);
+		MAP_ANALOG(ImGuiKey_GamepadLStickRight, controllerState.Gamepad.sThumbLX, +XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, +32767);
+		MAP_ANALOG(ImGuiKey_GamepadLStickUp, controllerState.Gamepad.sThumbLY, +XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, +32767);
+		MAP_ANALOG(ImGuiKey_GamepadLStickDown, controllerState.Gamepad.sThumbLY, -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, -32768);
+		MAP_ANALOG(ImGuiKey_GamepadRStickLeft, controllerState.Gamepad.sThumbRX, -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, -32768);
+		MAP_ANALOG(ImGuiKey_GamepadRStickRight, controllerState.Gamepad.sThumbRX, +XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, +32767);
+		MAP_ANALOG(ImGuiKey_GamepadRStickUp, controllerState.Gamepad.sThumbRY, +XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, +32767);
+		MAP_ANALOG(ImGuiKey_GamepadRStickDown, controllerState.Gamepad.sThumbRY, -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE, -32768);
 	}
 }
 
