@@ -13,6 +13,7 @@ struct SETTINGS {
 
     int default_display = 0;
     int color = 0;
+    std::vector<std::string> displays_name;
 
     struct {
 
