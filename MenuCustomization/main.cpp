@@ -12,9 +12,42 @@
 #include "CheatSettings/CheatSettings.h"
 #include "CheatSettings/Config.h"
 #include "GUI/GUI.h"
+#include <Xinput.h>
+#include <Xinput.h>
 #pragma comment(lib,"Urlmon.lib")
+#pragma comment(lib,"Xinput.lib")
 
 bool init = true;
+
+void LoadController() {
+	ImGuiIO& io = ImGui::GetIO();
+
+	XINPUT_STATE controllerState;
+	if (XInputGetState(0, &controllerState) == ERROR_SUCCESS) {
+
+		// Map controller buttons
+		const WORD buttons = controllerState.Gamepad.wButtons;
+		io.NavInputs[ImGuiNavInput_Activate] = (buttons & XINPUT_GAMEPAD_A) ? 1.0f : 0.0f;
+		io.NavInputs[ImGuiNavInput_Cancel] = (buttons & XINPUT_GAMEPAD_B) ? 1.0f : 0.0f;
+		io.NavInputs[ImGuiNavInput_Menu] = (buttons & XINPUT_GAMEPAD_X) ? 1.0f : 0.0f;
+		io.NavInputs[ImGuiNavInput_Input] = (buttons & XINPUT_GAMEPAD_Y) ? 1.0f : 0.0f;
+
+		// Additional controller triggers
+		io.NavInputs[ImGuiNavInput_FocusPrev] = (buttons & XINPUT_GAMEPAD_LEFT_SHOULDER) ? 1.0f : 0.0f; // L1
+		io.NavInputs[ImGuiNavInput_FocusNext] = (buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER) ? 1.0f : 0.0f; // R1
+		float l2 = controllerState.Gamepad.bLeftTrigger / 255.0f;
+		float r2 = controllerState.Gamepad.bRightTrigger / 255.0f;
+
+		// Map controller sticks
+		float lx = controllerState.Gamepad.sThumbLX / 32767.0f;
+		float ly = controllerState.Gamepad.sThumbLY / 32767.0f;
+
+		io.NavInputs[ImGuiNavInput_LStickLeft] = (lx < -0.3f) ? -lx : 0.0f;
+		io.NavInputs[ImGuiNavInput_LStickRight] = (lx > 0.3f) ? lx : 0.0f;
+		io.NavInputs[ImGuiNavInput_LStickUp] = (ly > 0.3f) ? ly : 0.0f;
+		io.NavInputs[ImGuiNavInput_LStickDown] = (ly < -0.3f) ? -ly : 0.0f;
+	}
+}
 
 void LoadKeys() {
 
@@ -92,6 +125,7 @@ void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHei
 
 	
 	LoadKeys();
+	LoadController();
 
 	ImGui::SetNextWindowBgAlpha(0.f);
 	ImGui::SetNextWindowPos({ (float)GameX, (float)GameY }, ImGuiCond_Always);
