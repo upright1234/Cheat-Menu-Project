@@ -156,4 +156,13 @@ struct SETTINGS {
         bool FeaturesDefinition = true;
         int FontStyle = 0;
     }Configs;
+
+    struct TriggerStruct{
+        bool ByWeapon = false;
+
+        bool Enable = true;
+        int MaxDistance = 50;
+        int Delay = 150;
+    }Trigger;
+    TriggerStruct triggerbot[11];
 };
