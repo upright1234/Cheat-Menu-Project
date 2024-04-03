@@ -11,17 +11,12 @@ struct SETTINGS {
     int iConfig = 0;
     int oldiConfig = 0;
 
-    int default_display = 0;
-    int color = 0;
-    std::vector<std::string> displays_name;
-
     struct {
 
         bool Enable = true;
         bool SaveTarget = true;
         bool AimLock = false;
         bool VisibilityCheck = true;
-        bool VisibilityCheckByColor = false;
         bool HumanizedSmooth = true;
 
         bool DrawFov = true;
