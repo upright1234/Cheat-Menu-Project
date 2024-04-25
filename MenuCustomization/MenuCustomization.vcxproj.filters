@@ -16,11 +16,14 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{18b15c31-4caa-4150-b30a-5918f1d1390c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Arquivos de Cabeçalho\OtherSettings">
-      <UniqueIdentifier>{c3d426ae-695f-494b-995d-6ef29e7c5a24}</UniqueIdentifier>
-    </Filter>
     <Filter Include="GUI">
       <UniqueIdentifier>{59c82382-85fe-4313-b5d2-1746ee2dcc03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Arquivos de Cabeçalho\Games">
+      <UniqueIdentifier>{dedb6d25-82f3-4abc-8a21-59bb3181e708}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GUI\Games">
+      <UniqueIdentifier>{3765ae2a-7ee2-4e44-af22-2703c7106bce}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -51,6 +54,24 @@
     <ClCompile Include="GUI\GUI.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
+    <ClCompile Include="GUI\Games\ApexLegends.cpp">
+      <Filter>GUI\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\nav_elements.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Games\Fortnite.cpp">
+      <Filter>GUI\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Games\MW3.cpp">
+      <Filter>GUI\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Games\Rust.cpp">
+      <Filter>GUI\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Games\Valorant.cpp">
+      <Filter>GUI\Games</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Imgui\imconfig.h">
@@ -80,31 +101,35 @@
     <ClInclude Include="Imgui\stb_image.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="CheatSettings\CheatSettings.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
     <ClInclude Include="CheatSettings\Config.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="GUI\GUI.h">
       <Filter>GUI</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="CheatSettings\ApexCheatSettings.txt">
-      <Filter>Arquivos de Cabeçalho\OtherSettings</Filter>
-    </Text>
-    <Text Include="CheatSettings\FortniteCheatSettings.txt">
-      <Filter>Arquivos de Cabeçalho\OtherSettings</Filter>
-    </Text>
-    <Text Include="CheatSettings\MW3CheatSettings.txt">
-      <Filter>Arquivos de Cabeçalho\OtherSettings</Filter>
-    </Text>
-    <Text Include="CheatSettings\RustCheatSettings.txt">
-      <Filter>Arquivos de Cabeçalho\OtherSettings</Filter>
-    </Text>
-    <Text Include="CheatSettings\ValorantCheatSettings.txt">
-      <Filter>Arquivos de Cabeçalho\OtherSettings</Filter>
-    </Text>
+    <ClInclude Include="CheatSettings\Games\ApexLegends.h">
+      <Filter>Arquivos de Cabeçalho\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="CheatSettings\Games\Fortnite.h">
+      <Filter>Arquivos de Cabeçalho\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="CheatSettings\Games\MW3.h">
+      <Filter>Arquivos de Cabeçalho\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="CheatSettings\Games\Rust.h">
+      <Filter>Arquivos de Cabeçalho\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="CheatSettings\Games\Valorant.h">
+      <Filter>Arquivos de Cabeçalho\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\icon_font.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\nav_elements.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="GUI\roboto_font.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

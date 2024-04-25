@@ -3,6 +3,12 @@
 #include <string>
 #include <vector>
 
+#define IsApex 0
+#define IsFortnite 1
+#define IsMW3 0
+#define IsRust 0
+#define IsValorant 0
+
 void InitPath(char* config_name = NULL);
 void Read();
 void Save();

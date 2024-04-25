@@ -1,46 +1,45 @@
 #pragma once
+#include <direct.h>
+#include <stdio.h>
 #include <Windows.h>
+#include <psapi.h>
+#include <intrin.h>
+#include <vector>
+#include "../Config.h"
+
+#if IsValorant
 
 struct SETTINGS {
+
     int iConfig = 0;
     int oldiConfig = 0;
-    int selectedWeapon = 0;
-    struct AimStruct {
+
+    struct {
+
         bool Enable = true;
         bool SaveTarget = true;
         bool AimLock = false;
-        bool VisibilityCheck = false;
-        bool HumanizedSmooth = false;
-        bool WeaponOnly = true;
-        bool IgnoreDowned = true;
-        bool Predict = true;
-        bool NPC = false;
-        bool ByWeapon = false;
+        bool VisibilityCheck = true;
+        bool HumanizedSmooth = true;
 
-        bool DrawFov = false;
+        bool DrawFov = true;
         bool DrawCrossHair = false;
-        bool DrawTarget = false;
-        int DrawTargetType = 1;
+        bool DrawTarget = true;
+        int DrawTargetType = 0;
         float DrawThickness = 1.f;
 
-        int HitBox = 0;
+        bool RecoilControl = true;
+        int Recoil = 30;
+        int delay = 0;
 
-        float FOV = 5.f;
-        float Smooth = 2.f;
-        float HumanizedSmoothPercent = 2.f;
+        int HitBox = 3;
+
+        int FOV = 45;
+        int Smooth = 1;
+        int HumanizedSmoothPercent = 1;
         int MaxDistance = 600;
+
     }Aim;
-
-    AimStruct aimbot[11];
-
-    struct {
-        bool TriggerBot = true;
-        int TriggerBotMaxDistance = 50;
-        int TriggerBotDelay = 150;
-
-        bool AimWhileJumping = false;
-        bool InstantSwitch = false;
-    }Misc;
 
     struct {
         struct {
@@ -49,25 +48,25 @@ struct SETTINGS {
             int MaxDistance = 800;
             float FontSize = 16.f;
 
-            bool Box = true;
-            bool RemoveDowned = false;
+            bool TeamCheck = true;
+            bool RemoveDormant = false;
             bool HeadCircle = true;
 
+            bool Box = true;
             int BoxType = 0;
             float BoxThickness = 1.f;
+
+            bool Health = true;
+            int HealthType = 0;
+            float HealthThickness = 4.f;
 
             bool Lines = true;
             int LinesPosition = 0;
             float LinesThickness = 1.f;
 
             bool Distance = true;
-            bool NickName = true;
 
-            bool Weapon = true;
-            bool WeaponRarity = true;
-            bool WeaponAmmo = true;
-
-            bool Skeleton = false;
+            bool Skeleton = true;
             float SkeletonThickness = 1.f;
 
             bool OutScreen = false;
@@ -77,22 +76,6 @@ struct SETTINGS {
             int OutScreenSize = 10.f;
 
         }Players;
-
-        struct {
-            bool Enable = false;
-
-            int MaxDistance = 800;
-            float FontSize = 16.f;
-
-            bool Chest = true;
-            bool Vehicle = true;
-            bool Ammo = true;
-            bool Weapon = true;
-            bool Consumable = true;
-            bool SupplyDrop = true;
-
-            int Rarity = 0;
-        }World;
 
         struct {
             bool Enable = true;
@@ -119,12 +102,10 @@ struct SETTINGS {
 
         struct {
             int TogglePlayers = VK_F7;
-            int ToggleWorld = VK_F7;
             int ToggleRadar = VK_F9;
         }Visuals;
 
         int Menu = VK_INSERT;
-        int Trigger = VK_XBUTTON1;
 
     }Keys;
 
@@ -140,7 +121,6 @@ struct SETTINGS {
             float NonVisible[3] = { 1.f, 0.f, 0.f };
             float Distance[3] = { 1.f, 1.f, 1.f };
             float NickName[3] = { 1.f, 1.f, 1.f };
-            float Weapon[3] = { 1.f, 1.f, 1.f };
         }Players;
 
         struct {
@@ -156,13 +136,6 @@ struct SETTINGS {
         bool FeaturesDefinition = true;
         int FontStyle = 0;
     }Configs;
-
-    struct TriggerStruct{
-        bool ByWeapon = false;
-
-        bool Enable = true;
-        int MaxDistance = 50;
-        int Delay = 150;
-    }Trigger;
-    TriggerStruct triggerbot[11];
 };
+
+#endif

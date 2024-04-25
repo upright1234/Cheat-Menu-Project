@@ -5,6 +5,9 @@
 #include <psapi.h>
 #include <intrin.h>
 #include <vector>
+#include "../Config.h"
+
+#if IsRust
 
 struct SETTINGS {
 
@@ -151,7 +154,7 @@ struct SETTINGS {
             bool WorldDrop = true;
             bool AirDrop = true;
             bool Traps = true;
-            bool TrapsType[7]= { true,true,false,false,false,false,false };
+            bool TrapsType[7] = { true,true,false,false,false,false,false };
             bool Vehicles = true;
             bool VehiclesType[9] = { true,true,false,false,false,false,false, false, false };
             bool Animals = true;
@@ -248,3 +251,5 @@ struct SETTINGS {
         bool FeaturesDefinition = true;
     }Configs;
 };
+
+#endif

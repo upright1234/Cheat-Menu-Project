@@ -9,13 +9,14 @@
 #include "Imgui/imgui.h"
 #include "Imgui/imgui_impl_dx11.h"
 #include "Imgui/imgui_impl_win32.h"
-#include "CheatSettings/CheatSettings.h"
 #include "CheatSettings/Config.h"
 #include "GUI/GUI.h"
 #include <Xinput.h>
 #include <Xinput.h>
 #pragma comment(lib,"Urlmon.lib")
 #pragma comment(lib,"Xinput.lib")
+#pragma comment(lib,"Winmm.lib")
+#pragma comment(lib,"d3dx11.lib")
 
 bool init = true;
 

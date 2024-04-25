@@ -145,7 +145,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(SolutionDir)MenuCustomization\Imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
       <ProgramDataBaseFileName />
     </ClCompile>
@@ -161,7 +161,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GUI\Games\ApexLegends.cpp" />
+    <ClCompile Include="GUI\Games\Fortnite.cpp" />
+    <ClCompile Include="GUI\Games\MW3.cpp" />
+    <ClCompile Include="GUI\Games\Rust.cpp" />
+    <ClCompile Include="GUI\Games\Valorant.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
+    <ClCompile Include="GUI\nav_elements.cpp" />
     <ClCompile Include="Imgui\imgui.cpp" />
     <ClCompile Include="Imgui\imgui_demo.cpp" />
     <ClCompile Include="Imgui\imgui_draw.cpp" />
@@ -172,9 +178,16 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CheatSettings\CheatSettings.h" />
     <ClInclude Include="CheatSettings\Config.h" />
+    <ClInclude Include="CheatSettings\Games\ApexLegends.h" />
+    <ClInclude Include="CheatSettings\Games\Fortnite.h" />
+    <ClInclude Include="CheatSettings\Games\MW3.h" />
+    <ClInclude Include="CheatSettings\Games\Rust.h" />
+    <ClInclude Include="CheatSettings\Games\Valorant.h" />
     <ClInclude Include="GUI\GUI.h" />
+    <ClInclude Include="GUI\icon_font.h" />
+    <ClInclude Include="GUI\nav_elements.h" />
+    <ClInclude Include="GUI\roboto_font.h" />
     <ClInclude Include="Imgui\imconfig.h" />
     <ClInclude Include="Imgui\imgui.h" />
     <ClInclude Include="Imgui\imgui_impl_dx11.h" />
@@ -184,13 +197,6 @@
     <ClInclude Include="Imgui\imstb_textedit.h" />
     <ClInclude Include="Imgui\imstb_truetype.h" />
     <ClInclude Include="Imgui\stb_image.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="CheatSettings\ApexCheatSettings.txt" />
-    <Text Include="CheatSettings\FortniteCheatSettings.txt" />
-    <Text Include="CheatSettings\MW3CheatSettings.txt" />
-    <Text Include="CheatSettings\RustCheatSettings.txt" />
-    <Text Include="CheatSettings\ValorantCheatSettings.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,6 +5,9 @@
 #include <psapi.h>
 #include <intrin.h>
 #include <vector>
+#include "../Config.h"
+
+#if IsMW3
 
 struct SETTINGS {
     int iConfig = 0;
@@ -110,7 +113,7 @@ struct SETTINGS {
         struct {
             int HoldPrimary = VK_LBUTTON;
             int HoldSecondary = VK_RBUTTON;
-            
+
             int SwitchToHead = VK_SHIFT;
             int Toggle = VK_F6;
         }Aimbot;
@@ -159,3 +162,5 @@ struct SETTINGS {
         bool FeaturesDefinition = true;
     }Configs;
 };
+
+#endif
