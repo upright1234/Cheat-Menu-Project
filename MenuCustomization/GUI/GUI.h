@@ -4,6 +4,7 @@
 #include "../CheatSettings/Games/MW3.h"
 #include "../CheatSettings/Games/Rust.h"
 #include "../CheatSettings/Games/Valorant.h"
+#include "../CheatSettings/Games/XDefiant.h"
 #include "../CheatSettings/Config.h"
 #include <d3d11.h>
 #include "../Imgui/imgui.h"
