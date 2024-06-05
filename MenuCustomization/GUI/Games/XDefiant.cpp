@@ -21,6 +21,8 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
     const char* LinesTypes[] = { ("Top"), ("Middle"), ("Bottom") };
     const char* AimTargetTypes[] = { ("Circle"), ("Triangle") };
     const char* HealthTypes[] = { ("Horizontal"), ("Vertical") };
+    const char* OutScreen_items[] = { ("Triangle"), ("Dot") };
+    const char* FontTypes[] = { ("Burbank"), ("Verdana") };
 
     const char* tab_name = "";
     const char* tab_icon = "";
@@ -49,7 +51,9 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
 
             if (elements::tab(icons, 2 == tabs, "C", ImVec2(50, 40))) tabs = 2;
 
-            if (elements::tab(icons, 3 == tabs, "D", ImVec2(50, 40))) tabs = 3;
+            if (elements::tab(icons, 3 == tabs, "E", ImVec2(50, 40))) tabs = 3;
+
+            if (elements::tab(icons, 4 == tabs, "D", ImVec2(50, 40))) tabs = 4;
 
         }
         ImGui::EndGroup();
@@ -71,7 +75,10 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                 elements::beginchild("Aim #1", ImVec2(305, 433), true);
                 {
                     elements::checkbox(("Enable Aim"), &Settings->Aim.Enable);
+                    elements::checkbox(("Memory Aimbot"), &Settings->Aim.MemoryAimbot);
+                    elements::checkbox(("Trigger Bot"), &Settings->Aim.TriggerBot);
                     elements::checkbox(("Save Target"), &Settings->Aim.SaveTarget);
+                    elements::checkbox(("Visibility Check"), &Settings->Aim.VisibilityCheck);
                     elements::checkbox(("Aim Lock"), &Settings->Aim.AimLock);
                     elements::checkbox(("Humanized Smooth"), &Settings->Aim.HumanizedSmooth);
                     elements::checkbox(("Ignore Knocked"), &Settings->Aim.IgnoreDowned);
@@ -89,14 +96,21 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
             {
                 elements::beginchild("Aim #2", ImVec2(305, 433), true);
                 {
+                    elements::sliderint(("Trigger Delay##Aim"), &Settings->Aim.TriggerBotDelay, 1, 1000);
                     elements::sliderint(("Max. Distance##Aim"), &Settings->Aim.MaxDistance, 0, 1000);
                     elements::sliderfloat(("Aim Draw Thickness"), &Settings->Aim.DrawThickness, 1, 5);
                     elements::combo(("Hitbox"), &Settings->Aim.HitBox, hitboxes, IM_ARRAYSIZE(hitboxes), 4);
 
                     elements::combo(("Draw Target Type"), &Settings->Aim.DrawTargetType, AimTargetTypes, IM_ARRAYSIZE(AimTargetTypes), 2);
                     elements::sliderfloat(("FOV"), &Settings->Aim.FOV, 1, 30);
-                    elements::sliderfloat(("Smooth"), &Settings->Aim.Smooth, 1, 30);
-                    elements::sliderfloat(("Humanized Smooth##percent"), &Settings->Aim.HumanizedSmoothPercent, 1, 10);
+                    if (Settings->Aim.MemoryAimbot) {
+
+                        elements::sliderfloat(("Speed"), &Settings->Aim.MemorySmooth, 0.f, 1.f);
+                    }
+                    else {
+                        elements::sliderfloat(("Smooth"), &Settings->Aim.Smooth, 1, 30);
+                        elements::sliderfloat(("Humanized Smooth##percent"), &Settings->Aim.HumanizedSmoothPercent, 1, 10);
+                    }
                 }
                 elements::endchild();
 
@@ -168,10 +182,16 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
             {
                 elements::beginchild("Visuals #2", ImVec2(305, 433), true);
                 {
-                    ImGui::ColorEdit4(("Player"), (float*)&Settings->Colors.Players.Visible, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+                    ImGui::ColorEdit4(("Player Visible"), (float*)&Settings->Colors.Players.Visible, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
+                    ImGui::ColorEdit4(("Player Non Visible"), (float*)&Settings->Colors.Players.NonVisible, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 
                     ImGui::ColorEdit4(("Player NickName"), (float*)&Settings->Colors.Players.NickName, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
-  
+
+                    ImGui::ColorEdit4(("Radar Visible"), (float*)&Settings->Colors.Radar.Visible, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
+                    ImGui::ColorEdit4(("Radar Enemies"), (float*)&Settings->Colors.Radar.Enemies, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
                 }
                 elements::endchild();
 
@@ -183,9 +203,47 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
 
             ImGui::BeginGroup();
             {
+                elements::beginchild("Radar #1", ImVec2(305, 433), true);
+                {
+                    elements::checkbox(("Enable Radar"), &Settings->Visuals.Radar.Enable);
+                    elements::checkbox(("Change Visible Enemies Color"), &Settings->Visuals.Radar.VisibleColor);
+                    elements::checkbox("Enable OutScreen", &Settings->Visuals.Players.OutScreen);
+                }
+                elements::endchild();
+
+            }
+            ImGui::EndGroup();
+
+            ImGui::SameLine();
+
+            ImGui::BeginGroup();
+            {
+                elements::beginchild("Radar #2", ImVec2(305, 433), true);
+                {
+                    elements::sliderint(("Position Hor."), &Settings->Visuals.Radar.PositionX, 1, 3000);
+                    elements::sliderint(("Position Vert."), &Settings->Visuals.Radar.PositionY, 1, 3000);
+                    elements::sliderint(("Radar Zoom"), &Settings->Visuals.Radar.Zoom, 1, 100);
+                    elements::sliderint(("Radar Size"), &Settings->Visuals.Radar.Size, 50, 500);
+                    elements::combo("OutScreen Type", &Settings->Visuals.Players.OutScreenType, OutScreen_items, IM_ARRAYSIZE(OutScreen_items), IM_ARRAYSIZE(OutScreen_items));
+                    elements::sliderint("OutScreen FOV", &Settings->Visuals.Players.OutScreenFov, 1, 100);
+                    elements::sliderint("OutScreen Size", &Settings->Visuals.Players.OutScreenSize, 1, 20);
+                    elements::sliderfloat("OutScreen Thickness", &Settings->Visuals.Players.OutScreenThickness, 1, 5);
+
+                }
+                elements::endchild();
+
+            }
+            ImGui::EndGroup();
+
+            }
+        else if (active_tab == 4) {
+
+            ImGui::BeginGroup();
+            {
                 elements::beginchild("HotKeys", ImVec2(305, 433), true);
                 {
                     elements::HotKey(("Cheat Menu Key"), &Settings->Keys.Menu, { 142, 29 });
+                    elements::HotKey(("Trigger Bot Key"), &Settings->Keys.Trigger, { 142, 29 });
                     elements::HotKey(("Aimbot Hold Primary"), &Settings->Keys.Aim.HoldPrimary, { 142, 29 });
                     elements::HotKey(("Aimbot Hold Secondary"), &Settings->Keys.Aim.HoldSecondary, { 142, 29 });
                     elements::HotKey(("Aimbot Switch To Head"), &Settings->Keys.Aim.SwitchToHead, { 142, 29 });
@@ -203,6 +261,28 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
             {
                 elements::beginchild("Configs", ImVec2(305, 433), true);
                 {
+                    ImGui::Checkbox("Visibility Check By Color", &Settings->Configs.VisibilityByColor);
+                    if (Settings->Configs.VisibilityByColor) {
+                        if (Settings->display_amount) {
+                            const char** DisplaysLabels = (const char**)malloc(sizeof(const char*) * Settings->display_amount);
+                            for (int k = 0; k < Settings->display_amount; k++) {
+                                DisplaysLabels[k] = std::string("Display " + std::to_string(k)).c_str();
+                            }
+                            if (Settings->default_display >= Settings->display_amount) {
+                                Settings->default_display = 0;
+                            }
+                            elements::combo("Game Display", &Settings->default_display, DisplaysLabels, Settings->display_amount);
+                        }
+                        ImGui::ColorEdit4("Color To Check", Settings->Configs.Color, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs);
+                        elements::sliderint("Red Variation", &Settings->Configs.offset_red, 0, 255);
+                        elements::sliderint("Green Variation", &Settings->Configs.offset_green, 0, 255);
+                        elements::sliderint("Blue Variation", &Settings->Configs.offset_blue, 0, 255);
+                    }
+
+                    ImGui::Separator();
+
+                    elements::combo("Render Font Style", &Settings->Configs.FontStyle, FontTypes, IM_ARRAYSIZE(FontTypes), IM_ARRAYSIZE(FontTypes));
+
                     if (elements::combo(("Select Your Config"), &Settings->iConfig, g_pConfig->szConfigs.c_str(), g_pConfig->szConfigs.size())) {
                         if (Settings->oldiConfig != Settings->iConfig) {
                             g_pConfig->InitPath(&g_pConfig->vecConfigs[Settings->oldiConfig][0u]);

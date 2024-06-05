@@ -12,11 +12,17 @@
 struct SETTINGS {
     int iConfig = 0;
     int oldiConfig = 0;
-    int selectedWeapon = 0;
+    int default_display = 0;
+    int display_amount = 0;
+
     struct AimStruct {
         bool Enable = true;
+        bool MemoryAimbot = true;
+        bool TriggerBot = true;
+        int TriggerBotDelay = 50;
         bool SaveTarget = true;
         bool AimLock = false;
+        bool VisibilityCheck = false;
         bool HumanizedSmooth = false;
         bool IgnoreDowned = true;
 
@@ -30,6 +36,7 @@ struct SETTINGS {
 
         float FOV = 5.f;
         float Smooth = 2.f;
+        float MemorySmooth = 0.1f;
         float HumanizedSmoothPercent = 2.f;
         int MaxDistance = 600;
     }Aim;
@@ -61,7 +68,24 @@ struct SETTINGS {
             bool Health = true;
             int HealthType = 1;
             float HealthThickness = 4.f;
+
+            bool OutScreen = true;
+            int OutScreenType = 0;
+            int OutScreenFov = 15;
+            float OutScreenThickness = 2.f;
+            int OutScreenSize = 10.f;
         }Players;
+
+        struct {
+            bool Enable = true;
+            int PositionX = 40;
+            int PositionY = 30;
+            int Size = 200;
+            int Zoom = 1;
+
+            bool VisibleColor = true;
+            int MaxDistance = 150;
+        }Radar;
     }Visuals;
 
     struct {
@@ -75,9 +99,11 @@ struct SETTINGS {
 
         struct {
             int TogglePlayers = VK_F7;
+            int ToggleRadar = VK_F8;
         }Visuals;
 
         int Menu = VK_INSERT;
+        int Trigger = VK_XBUTTON1;
 
     }Keys;
 
@@ -90,15 +116,28 @@ struct SETTINGS {
 
         struct {
             float Visible[3] = { 1.f, 1.f, 1.f };
+            float NonVisible[3] = { 1.f, 0.f, 0.f };
             float Distance[3] = { 1.f, 1.f, 1.f };
             float NickName[3] = { 1.f, 1.f, 1.f };
         }Players;
+
+        struct {
+            float Enemies[3] = { 1.f, 0.f, 0.f };
+            float Visible[3] = { 0.f, 1.0f, 0.f };
+        }Radar;
     }Colors;
 
     struct {
         int Language = 0;
         bool FeaturesDefinition = true;
         int FontStyle = 0;
+        bool VisibilityByColor = true;
+
+
+        float Color[3] = { 255 / 255.f, 102 / 255.f, 102 / 255.f };
+        int offset_red = 60;
+        int offset_blue = 60;
+        int offset_green = 60;
     }Configs;
 };
 
