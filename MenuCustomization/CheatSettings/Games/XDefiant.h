@@ -9,6 +9,7 @@
 
 #if IsXDefiant
 
+
 struct SETTINGS {
     int iConfig = 0;
     int oldiConfig = 0;
@@ -140,5 +141,6 @@ struct SETTINGS {
         int offset_green = 60;
     }Configs;
 };
+
 
 #endif
