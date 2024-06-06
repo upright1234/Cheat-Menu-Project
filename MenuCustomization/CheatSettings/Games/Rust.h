@@ -156,6 +156,7 @@ struct SETTINGS {
             bool OreType[3] = { true,true,false };
             bool Hemp = true;
             bool WorldDrop = true;
+            bool WorldType[14] = { true,true,true,true,true,true,true,true,true,true,true,true,true,true };
             bool AirDrop = true;
             bool Traps = true;
             bool TrapsType[7] = { true,true,false,false,false,false,false };

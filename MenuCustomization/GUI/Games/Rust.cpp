@@ -235,7 +235,13 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                 {
                     elements::checkbox(("Corpse"), &Settings->Visuals.Items.Corpse);
                     elements::checkbox(("Hemp"), &Settings->Visuals.Items.Hemp);
-                    elements::checkbox(("World Drop"), &Settings->Visuals.Items.WorldDrop);
+                    elements::checkbox(("World Drop"), &Settings->Visuals.Items.WorldDrop); 
+                    if (Settings->Visuals.Items.WorldDrop) {
+                        std::vector<std::string> world_list = { std::string("Weapon"), std::string("Construction"), std::string("Items")
+                            , std::string("Resources"), std::string("Attire"), std::string("Tool"), std::string("Medical"), std::string("Food")
+                        , std::string("Ammunition") , std::string("Traps") , std::string("Misc") , std::string("Common") , std::string("Component") , std::string("Search") };
+                        MultiCombo("", Settings->Visuals.Items.WorldType, world_list);
+                    }
                     elements::checkbox(("AirDrop"), &Settings->Visuals.Items.AirDrop);
                     elements::checkbox(("Cupboard"), &Settings->Visuals.Items.Cupboard);
                     elements::checkbox(("Ore"), &Settings->Visuals.Items.Ore);
