@@ -56,6 +56,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
     const char* AimTargetTypes[] = { ("Circle"), ("Triangle") };
     const char* HealthTypes[] = { ("Horizontal"), ("Vertical") };
     const char* OutScreen_items[] = { ("Triangle"), ("Dot") };
+    const char* FontTypes[] = { ("Burbank"), ("Verdana") };
 
     const char* tab_name = "";
     const char* tab_icon = "";
@@ -159,6 +160,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                     elements::checkbox(("Weapon"), &Settings->Visuals.Players.Weapon);
                     elements::checkbox(("Chams"), &Settings->Visuals.Players.Chams);
                     elements::checkbox(("HotBar"), &Settings->Visuals.Players.HotBar);
+                    
                 }
                 elements::endchild();
 
@@ -179,6 +181,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                     elements::combo(("Lines Position"), &Settings->Visuals.Players.LinesPosition, LinesTypes, IM_ARRAYSIZE(LinesTypes), 3);
                     elements::sliderfloat(("Lines Thickness"), &Settings->Visuals.Players.LinesThickness, 1.0f, 5.0f);
                     if (Settings->Visuals.Players.HotBar) {
+                        elements::sliderfloat("HotBar Font Size", &Settings->Visuals.Players.HotBarFontSize, 10.0f, 25.0f, "%.1f");
                         elements::sliderint(("HotBar Pos X"), &Settings->Visuals.Players.HotBarX, 1, 3000);
                         elements::sliderint(("HotBar Pos Y"), &Settings->Visuals.Players.HotBarY, 1, 3000);
                     }
@@ -341,9 +344,14 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                         elements::sliderfloat(("Admin Time"), &Settings->Misc.time, 0.f, 24.f, "%.1f");
                     }
                     elements::checkbox(("FOV Changer"), &Settings->Misc.FovChanger);
-                    if (Settings->Misc.night_mode)
+                    if (Settings->Misc.FovChanger)
                     {
                         elements::sliderfloat(("FOV Slider"), &Settings->Misc.FovChangerValue, 10.f, 180.f, "%.1f");
+                    }
+                    elements::checkbox(("Zoom FOV"), &Settings->Misc.ZoomFov);
+                    if (Settings->Misc.ZoomFov)
+                    {
+                        elements::sliderfloat(("Zoom Slider"), &Settings->Misc.ZoomFovValue, 50.f, 300.f, "%.1f");
                     }
                 }
                 elements::endchild();
@@ -416,6 +424,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                 elements::beginchild("HotKeys", ImVec2(305, 433), true);
                 {
                     elements::HotKey(("Cheat Menu Key"), &Settings->Keys.Menu, { 142, 29 });
+                    elements::HotKey(("Zoom Hold"), &Settings->Keys.ZoomFovHold, { 142, 29 });
                     elements::HotKey(("Admin Flag Key"), &Settings->Keys.AdminFlag, { 142, 29 });
                     elements::HotKey(("Admin Flag Hold"), &Settings->Keys.AdminFlagHold, { 142, 29 });
 
@@ -439,6 +448,8 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
             {
                 elements::beginchild("Configs", ImVec2(305, 433), true);
                 {
+                    elements::combo(("Render Font Style"), &Settings->Configs.FontStyle, FontTypes, IM_ARRAYSIZE(FontTypes));
+
                     if (elements::combo(("Select Your Config"), &Settings->iConfig, g_pConfig->szConfigs.c_str(), g_pConfig->szConfigs.size())) {
                         if (Settings->oldiConfig != Settings->iConfig) {
                             g_pConfig->InitPath(&g_pConfig->vecConfigs[Settings->oldiConfig][0u]);

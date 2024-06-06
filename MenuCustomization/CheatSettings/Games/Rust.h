@@ -67,6 +67,9 @@ struct SETTINGS {
         bool nightSky = false;
         bool night_mode = false;
         float time = 24.f;
+
+        bool ZoomFov = false;
+        float ZoomFovValue = 30.f;
     }Misc;
 
     struct {
@@ -108,6 +111,7 @@ struct SETTINGS {
             bool HotBar = true;
             int HotBarX = 300;
             int HotBarY = 20;
+            float HotBarFontSize = 16.f;
 
             bool Chams = true;
 
@@ -200,6 +204,7 @@ struct SETTINGS {
         int Menu = VK_INSERT;
         int AdminFlag = VK_F3;
         int AdminFlagHold = VK_F5;
+        int ZoomFovHold = VK_XBUTTON2;
 
     }Keys;
 
@@ -249,6 +254,7 @@ struct SETTINGS {
     struct {
         int Language = 0;
         bool FeaturesDefinition = true;
+        int FontStyle = 0;
     }Configs;
 };
 
