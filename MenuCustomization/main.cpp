@@ -13,6 +13,7 @@
 #include "GUI/GUI.h"
 #include <Xinput.h>
 #include <Xinput.h>
+#include "Log.h"
 #pragma comment(lib,"Urlmon.lib")
 #pragma comment(lib,"Xinput.lib")
 #pragma comment(lib,"Winmm.lib")
@@ -132,7 +133,6 @@ void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHei
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	
 	LoadKeys();
 	LoadController();
 
@@ -146,14 +146,12 @@ void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHei
 		init = false;
 	}
 
-
 	//Put your menu here
 	if (*ShowMenu == true)
 		RenderMyMenu(ShowMenu, Settings, g_pConfig);
 
 	ImGui::End();
 	ImGui::EndFrame();
-
 }
 
 void EndRender() {

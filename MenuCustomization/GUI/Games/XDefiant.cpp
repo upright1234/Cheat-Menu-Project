@@ -2,6 +2,7 @@
 #include  <fstream>
 #include "../nav_elements.h"
 #include "../../Imgui/imgui_internal.h"
+#include "../../Log.h"
 
 #if IsXDefiant
 float animation_ = 0.0f;
@@ -249,6 +250,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                     elements::HotKey(("Aimbot Switch To Head"), &Settings->Keys.Aim.SwitchToHead, { 142, 29 });
                     elements::HotKey(("Aimbot Toggle"), &Settings->Keys.Aim.Toggle, { 142, 29 });
                     elements::HotKey(("Visuals Toggle Players"), &Settings->Keys.Visuals.TogglePlayers, { 142, 29 });
+
                 }
                 elements::endchild();
 
@@ -264,14 +266,14 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                     ImGui::Checkbox("Visibility Check By Color", &Settings->Configs.VisibilityByColor);
                     if (Settings->Configs.VisibilityByColor) {
                         if (Settings->display_amount) {
-                            const char** DisplaysLabels = (const char**)malloc(sizeof(const char*) * Settings->display_amount);
+                            std::vector<const char*> DisplaysLabels;
                             for (int k = 0; k < Settings->display_amount; k++) {
-                                DisplaysLabels[k] = std::string("Display " + std::to_string(k)).c_str();
+                                DisplaysLabels.push_back(std::string("Display " + std::to_string(k)).c_str());
                             }
                             if (Settings->default_display >= Settings->display_amount) {
                                 Settings->default_display = 0;
                             }
-                            elements::combo("Game Display", &Settings->default_display, DisplaysLabels, Settings->display_amount);
+                            elements::combo("Game Display", &Settings->default_display, DisplaysLabels.data(), Settings->display_amount);
                         }
                         ImGui::ColorEdit4("Color To Check", Settings->Configs.Color, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs);
                         elements::sliderint("Red Variation", &Settings->Configs.offset_red, 0, 255);

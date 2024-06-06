@@ -75,6 +75,9 @@
     <ClCompile Include="GUI\Games\XDefiant.cpp">
       <Filter>GUI\Games</Filter>
     </ClCompile>
+    <ClCompile Include="Log.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Imgui\imconfig.h">
@@ -136,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="CheatSettings\Games\XDefiant.h">
       <Filter>Arquivos de Cabeçalho\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="Log.h">
+      <Filter>Arquivos de Origem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
