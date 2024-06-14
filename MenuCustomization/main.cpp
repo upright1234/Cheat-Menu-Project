@@ -13,7 +13,6 @@
 #include "GUI/GUI.h"
 #include <Xinput.h>
 #include <Xinput.h>
-#include "Log.h"
 #pragma comment(lib,"Urlmon.lib")
 #pragma comment(lib,"Xinput.lib")
 #pragma comment(lib,"Winmm.lib")

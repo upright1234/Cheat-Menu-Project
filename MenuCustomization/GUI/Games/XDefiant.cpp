@@ -2,7 +2,6 @@
 #include  <fstream>
 #include "../nav_elements.h"
 #include "../../Imgui/imgui_internal.h"
-#include "../../Log.h"
 
 #if IsXDefiant
 float animation_ = 0.0f;
@@ -24,6 +23,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
     const char* HealthTypes[] = { ("Horizontal"), ("Vertical") };
     const char* OutScreen_items[] = { ("Triangle"), ("Dot") };
     const char* FontTypes[] = { ("Burbank"), ("Verdana") };
+    const char* ColorTypes[] = { ("Disabled"), ("Deuteranopia"), ("Tritanopia"), ("Protanopia") };
 
     const char* tab_name = "";
     const char* tab_icon = "";
@@ -275,7 +275,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                             }
                             elements::combo("Game Display", &Settings->default_display, DisplaysLabels.data(), Settings->display_amount);
                         }
-                        ImGui::ColorEdit4("Color To Check", Settings->Configs.Color, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs);
+                        elements::combo("Color Blind Mode", &Settings->Configs.VisibilityColor, ColorTypes, IM_ARRAYSIZE(ColorTypes), IM_ARRAYSIZE(ColorTypes));
                         elements::sliderint("Red Variation", &Settings->Configs.offset_red, 0, 255);
                         elements::sliderint("Green Variation", &Settings->Configs.offset_green, 0, 255);
                         elements::sliderint("Blue Variation", &Settings->Configs.offset_blue, 0, 255);

@@ -133,14 +133,12 @@ struct SETTINGS {
         bool FeaturesDefinition = true;
         int FontStyle = 0;
         bool VisibilityByColor = true;
+        int VisibilityColor = 0;
 
-
-        float Color[3] = { 255 / 255.f, 102 / 255.f, 102 / 255.f };
         int offset_red = 60;
         int offset_blue = 60;
         int offset_green = 60;
     }Configs;
 };
-
 
 #endif
