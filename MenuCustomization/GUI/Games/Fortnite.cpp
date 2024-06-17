@@ -22,7 +22,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
     const char* rarities[] = { ("All"), ("Uncommon"), ("Rare"), ("Epic"), ("Legendary") };
     const char* LinesTypes[] = { ("Top"), ("Middle"), ("Bottom") };
     const char* AimTargetTypes[] = { ("Circle"), ("Triangle") };
-    const char* WeaponTypes[] = { ("Shotgun"), ("SMG"), ("Pistol"), ("Bolt"), ("Sniper"), ("Rifle") }; 
+    const char* WeaponTypes[] = { ("Shotgun"), ("SMG"), ("Pistol"), ("Bolt"), ("Sniper"), ("Rifle") , ("Others") }; 
     const char* OutScreen_items[] = { ("Triangle"), ("Dot") };
 
     const char* tab_name = "";
