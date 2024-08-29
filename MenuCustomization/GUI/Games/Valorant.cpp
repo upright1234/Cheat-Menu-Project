@@ -51,13 +51,11 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
 
             if (elements::tab(icons, 1 == tabs, "B##1", ImVec2(50, 40))) tabs = 1;
 
-            if (elements::tab(icons, 2 == tabs, "B##2", ImVec2(50, 40))) tabs = 2;
+            if (elements::tab(icons, 2 == tabs, "E", ImVec2(50, 40))) tabs = 2;
 
-            if (elements::tab(icons, 3 == tabs, "E", ImVec2(50, 40))) tabs = 3;
+            if (elements::tab(icons, 3 == tabs, "C", ImVec2(50, 40))) tabs = 3;
 
-            if (elements::tab(icons, 4 == tabs, "C", ImVec2(50, 40))) tabs = 4;
-
-            if (elements::tab(icons, 5 == tabs, "D", ImVec2(50, 40))) tabs = 5;
+            if (elements::tab(icons, 4 == tabs, "D", ImVec2(50, 40))) tabs = 4;
 
         }
         ImGui::EndGroup();

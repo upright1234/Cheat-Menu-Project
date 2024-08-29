@@ -166,6 +166,7 @@
     <ClCompile Include="GUI\Games\MW3.cpp" />
     <ClCompile Include="GUI\Games\Rust.cpp" />
     <ClCompile Include="GUI\Games\Valorant.cpp" />
+    <ClCompile Include="GUI\Games\XDefiant.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
     <ClCompile Include="GUI\nav_elements.cpp" />
     <ClCompile Include="Imgui\imgui.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="CheatSettings\Games\MW3.h" />
     <ClInclude Include="CheatSettings\Games\Rust.h" />
     <ClInclude Include="CheatSettings\Games\Valorant.h" />
+    <ClInclude Include="CheatSettings\Games\XDefiant.h" />
     <ClInclude Include="GUI\GUI.h" />
     <ClInclude Include="GUI\icon_font.h" />
     <ClInclude Include="GUI\nav_elements.h" />

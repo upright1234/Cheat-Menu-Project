@@ -67,6 +67,9 @@ struct SETTINGS {
         bool nightSky = false;
         bool night_mode = false;
         float time = 24.f;
+
+        bool ZoomFov = false;
+        float ZoomFovValue = 30.f;
     }Misc;
 
     struct {
@@ -108,6 +111,7 @@ struct SETTINGS {
             bool HotBar = true;
             int HotBarX = 300;
             int HotBarY = 20;
+            float HotBarFontSize = 16.f;
 
             bool Chams = true;
 
@@ -152,6 +156,7 @@ struct SETTINGS {
             bool OreType[3] = { true,true,false };
             bool Hemp = true;
             bool WorldDrop = true;
+            bool WorldType[14] = { true,true,true,true,true,true,true,true,true,true,true,true,true,true };
             bool AirDrop = true;
             bool Traps = true;
             bool TrapsType[7] = { true,true,false,false,false,false,false };
@@ -200,6 +205,7 @@ struct SETTINGS {
         int Menu = VK_INSERT;
         int AdminFlag = VK_F3;
         int AdminFlagHold = VK_F5;
+        int ZoomFovHold = VK_XBUTTON2;
 
     }Keys;
 
@@ -249,6 +255,7 @@ struct SETTINGS {
     struct {
         int Language = 0;
         bool FeaturesDefinition = true;
+        int FontStyle = 0;
     }Configs;
 };
 

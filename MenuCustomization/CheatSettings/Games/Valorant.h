@@ -10,7 +10,7 @@
 #if IsValorant
 
 struct SETTINGS {
-
+    
     int iConfig = 0;
     int oldiConfig = 0;
 
@@ -83,7 +83,7 @@ struct SETTINGS {
             int PositionY = 30;
             int Zoom = 10;
             int Size = 200;
-
+            
             bool VisibleColor = true;
             bool ClosestColor = true;
             int ClosestDistance = 100;
