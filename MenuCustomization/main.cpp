@@ -112,7 +112,6 @@ void LoadKeys() {
 }
 
 bool InitializeMenu(HWND Window, ID3D11Device* g_pd3dDevice, ID3D11DeviceContext* g_pd3dDeviceContext, int* ResellerMenuColor) {
-
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	InitMyMenu(g_pd3dDevice);
@@ -124,6 +123,7 @@ bool InitializeMenu(HWND Window, ID3D11Device* g_pd3dDevice, ID3D11DeviceContext
 	ret = ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 	if (!ret)
 		return false;
+	return true;
 }
 
 void RenderMenu(bool* ShowMenu, int GameX, int GameY, int GameWidth, int GameHeight, SETTINGS* Settings, CConfig* g_pConfig)
