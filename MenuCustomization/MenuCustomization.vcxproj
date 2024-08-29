@@ -164,6 +164,7 @@
     <ClCompile Include="GUI\Games\ApexLegends.cpp" />
     <ClCompile Include="GUI\Games\Fortnite.cpp" />
     <ClCompile Include="GUI\Games\MW3.cpp" />
+    <ClCompile Include="GUI\Games\PUBG.cpp" />
     <ClCompile Include="GUI\Games\Rust.cpp" />
     <ClCompile Include="GUI\Games\Valorant.cpp" />
     <ClCompile Include="GUI\Games\XDefiant.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="CheatSettings\Games\ApexLegends.h" />
     <ClInclude Include="CheatSettings\Games\Fortnite.h" />
     <ClInclude Include="CheatSettings\Games\MW3.h" />
+    <ClInclude Include="CheatSettings\Games\PUBG.h" />
     <ClInclude Include="CheatSettings\Games\Rust.h" />
     <ClInclude Include="CheatSettings\Games\Valorant.h" />
     <ClInclude Include="CheatSettings\Games\XDefiant.h" />

@@ -8,7 +8,8 @@
 #define IsMW3 0
 #define IsRust 0
 #define IsValorant 0
-#define IsXDefiant 1
+#define IsXDefiant 0
+#define IsPUBG 1
 
 void InitPath(char *config_name = NULL);
 void Read();
