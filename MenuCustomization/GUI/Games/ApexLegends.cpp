@@ -22,7 +22,11 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
     const char* RarityTypes[] = { ("All"), ("Common"), ("Rare"), ("Epic"), ("Legendary") };
     const char* HealthTypes[] = { ("Horizontal"), ("Vertical") };
     const char* OutScreen_items[] = { ("Triangle"), ("Dot") };
-    const char* GlowTypes[] = { ("Custom Color"), ("Single Color") };
+    const char* GlowBodyTypes[] = { "None", "Pink", "Pink Visible Only", "Pulsing 1", "Pulsing Line Invisible Only", "Dark Pulsing Line", "Sharp Pulsing Visible", "Sharp Pulsing", "Pulsing Red Line", "Fast Pulsing Invisible Only", "Pulsing Up Visible Only", "Solid Pulsing", "Solid Pulsing 2", "Bright", "Bright 2", "Light", "Light Solid", "Red Pulsing Visible Only", "Wave", "Shaded Visible", "Wireframe", "Wireframe Visible Only", "Black", "Black Visible Only" };
+    const char* GlowOutlineTypes[] = { "None", "Bright", "Bright Invisible Only", "Dark", "Pink", "White", "Gold Flashing", "Gold", "Brown", "Wave", "Red Visible Only", "Red Bright", "Heartbeat Visible Only", "Green Invisible Only", "Visible Only", "Bright Orange", "Red 2" };
+    const char* AimbotTypes[] = { ("Disabled"), ("Mouse (Safe)"), ("Memory Aim") };
+    const char* SuperGlideTypes[] = { ("75 FPS"), ("144 FPS"), ("240 FPS") };
+    const char* SuperGlideTypes2[] = { ("By Key"), ("Automatic (Controller)") };
 
     const char* tab_name = "";
     const char* tab_icon = "";
@@ -46,6 +50,8 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
         {
 
             if (elements::tab(icons, 0 == tabs, "A", ImVec2(50, 40))) tabs = 0;
+
+            if (elements::tab(icons, 6 == tabs, "A", ImVec2(50, 40))) tabs = 6;
 
             if (elements::tab(icons, 1 == tabs, "B##1", ImVec2(50, 40))) tabs = 1;
 
@@ -76,7 +82,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
             {
                 elements::beginchild("Aim #1", ImVec2(305, 433), true);
                 {
-                    elements::checkbox(("Enable Aim"), &Settings->Aimbot.Enable);
+                    elements::combo("Enable", &Settings->Aimbot.Enable, AimbotTypes, IM_ARRAYSIZE(AimbotTypes), IM_ARRAYSIZE(AimbotTypes));
                     elements::checkbox(("Save Target"), &Settings->Aimbot.SaveTarget);
                     elements::checkbox(("Aim Lock"), &Settings->Aimbot.AimLock);
                     elements::checkbox(("Predict"), &Settings->Aimbot.Predict);
@@ -107,6 +113,35 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                     elements::sliderfloat(("FOV"), &Settings->Aimbot.FOV, 1.0f, 30.f);
                     elements::sliderfloat(("Smooth"), &Settings->Aimbot.Smooth, 1.f, 30.0f);
                     elements::sliderfloat(("Humanized Smooth##percent"), &Settings->Aimbot.HumanizedSmoothPercent, 1.f, 10.f);
+                }
+                elements::endchild();
+
+            }
+            ImGui::EndGroup();
+        }
+
+        else if (active_tab == 6) {
+            ImGui::BeginGroup();
+            {
+                elements::beginchild("Trigger #1", ImVec2(305, 433), true);
+                {
+                    elements::checkbox(("Enable"), &Settings->TriggerBot.Enable);
+                    elements::checkbox(("While ADS Only"), &Settings->TriggerBot.WhileADS);
+                    elements::checkbox(("Pressing Key Only"), &Settings->TriggerBot.ByKey);
+                }
+                elements::endchild();
+
+            }
+            ImGui::EndGroup();
+
+            ImGui::SameLine();
+
+            ImGui::BeginGroup();
+            {
+                elements::beginchild("Trigger #2", ImVec2(305, 433), true);
+                {
+                    elements::sliderint(("Max. Distance##Trigger"), &Settings->Aimbot.MaxDistance, 1, 1000);
+                    elements::sliderint(("Delay##Trigger"), &Settings->Aimbot.MaxDistance, 0, 2000);
                 }
                 elements::endchild();
 
@@ -146,7 +181,9 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                     elements::sliderint(("Max. Distance##ESP"), &Settings->Visuals.Players.MaxDistance, 0, 1000);
                     elements::sliderfloat(("Font Size"), &Settings->Visuals.Players.FontSize, 10.0f, 25.0f);
                     elements::sliderfloat(("Skeleton Thickness"), &Settings->Visuals.Players.SkeletonThickness, 1.0f, 5.0f);
-                    elements::combo(("Glow Type"), &Settings->Visuals.Players.GlowType, GlowTypes, IM_ARRAYSIZE(GlowTypes), 2);
+                    elements::sliderint("Glow Border Thickness", &Settings->Visuals.Players.GlowRadius, 32, 200, "%d");
+                    elements::combo("Glow Body Style", &Settings->Visuals.Players.BodyStyle, GlowBodyTypes, IM_ARRAYSIZE(GlowBodyTypes), IM_ARRAYSIZE(GlowBodyTypes));
+                    elements::combo("Glow Outline Style", &Settings->Visuals.Players.OutlineStyle, GlowOutlineTypes, IM_ARRAYSIZE(GlowOutlineTypes), IM_ARRAYSIZE(GlowOutlineTypes));
                     elements::combo(("Box Type"), &Settings->Visuals.Players.BoxType, boxes, IM_ARRAYSIZE(boxes), 2);
                     elements::sliderfloat(("Box Thickness"), &Settings->Visuals.Players.BoxThickness, 1.0f, 5.0f);
                     elements::combo(("Lines Position"), &Settings->Visuals.Players.LinesPosition, LinesTypes, IM_ARRAYSIZE(LinesTypes), 3);
@@ -306,6 +343,14 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                     elements::HotKey(("Visuals Toggle Players"), &Settings->Keys.Visuals.TogglePlayers, { 142, 29 });
                     elements::HotKey(("Visuals Toggle Items"), &Settings->Keys.Visuals.ToggleItems, { 142, 29 });
                     elements::HotKey(("Visuals Toggle Radar"), &Settings->Keys.Visuals.ToggleRadar, { 142, 29 });
+                    elements::HotKey(("Bhop"), &Settings->Keys.Bhop, { 142, 29 });
+                    elements::HotKey(("Fake Duck"), &Settings->Keys.FakeDuck, { 142, 29 });
+                    elements::HotKey(("Free Cam"), &Settings->Keys.FreeCam, { 142, 29 });
+                    elements::HotKey(("Super Glide"), &Settings->Keys.SuperGlide, { 142, 29 });
+                    elements::HotKey(("Super Grappler"), &Settings->Keys.SuperGrappler, { 142, 29 });
+                    elements::HotKey(("Trigger Bot"), &Settings->Keys.Trigger, { 142, 29 });
+                    elements::HotKey(("Rapid Fire"), &Settings->Keys.RapidFire, { 142, 29 });
+                    elements::HotKey(("Wall Jump"), &Settings->Keys.WallJump, { 142, 29 });
                 }
                 elements::endchild();
 
@@ -318,6 +363,26 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
             {
                 elements::beginchild("Configs", ImVec2(305, 433), true);
                 {
+                   elements::checkbox("Fake Duck", &Settings->Misc.FakeDuck);
+                   elements::checkbox("Super Grappler", &Settings->Misc.SuperGrappler);
+                   elements::checkbox("FreeCam", &Settings->Misc.FreeCam);
+                   elements::checkbox("Super Glide", &Settings->Misc.SuperGlide);
+                   elements::checkbox("BunnyHop", &Settings->Misc.Bhop);
+                   elements::checkbox("Rapid Fire", &Settings->Misc.RapidFire);
+                    if (Settings->Misc.RapidFire) {
+
+                        elements::sliderint("Rapid Fire Delay", &Settings->Misc.RapidFireDelay, 25, 200);
+                    }
+                    if (Settings->Misc.SuperGlide) {
+                        elements::combo("Super Glide FPS", &Settings->Misc.SuperGlideType, SuperGlideTypes, IM_ARRAYSIZE(SuperGlideTypes), IM_ARRAYSIZE(SuperGlideTypes));
+                        elements::combo("Super Glide Mode", &Settings->Misc.SuperGlideMode, SuperGlideTypes2, IM_ARRAYSIZE(SuperGlideTypes2), IM_ARRAYSIZE(SuperGlideTypes2));
+                    }
+                    elements::checkbox("Fast Movement", &Settings->Misc.FastMovement);
+                    elements::checkbox("Skin Changer", &Settings->Misc.SkinChanger);
+                    elements::sliderint("Skin ID", &Settings->Misc.SkinID, 1, 12);
+                    elements::checkbox("Spectator Count", &Settings->Misc.SpectatorCount);
+                    elements::checkbox("Spectator List", &Settings->Misc.SpectatorList);
+
                     if (elements::combo(("Select Your Config"), &Settings->iConfig, g_pConfig->szConfigs.c_str(), g_pConfig->szConfigs.size())) {
                         if (Settings->oldiConfig != Settings->iConfig) {
                             g_pConfig->InitPath(&g_pConfig->vecConfigs[Settings->oldiConfig][0u]);

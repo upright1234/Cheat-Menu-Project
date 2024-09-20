@@ -75,6 +75,9 @@
     <ClCompile Include="GUI\Games\XDefiant.cpp">
       <Filter>GUI\Games</Filter>
     </ClCompile>
+    <ClCompile Include="GUI\Games\PUBG.cpp">
+      <Filter>GUI\Games</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Imgui\imconfig.h">
@@ -135,6 +138,9 @@
       <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="CheatSettings\Games\XDefiant.h">
+      <Filter>Arquivos de Cabeçalho\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="CheatSettings\Games\PUBG.h">
       <Filter>Arquivos de Cabeçalho\Games</Filter>
     </ClInclude>
   </ItemGroup>

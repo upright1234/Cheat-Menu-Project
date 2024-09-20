@@ -10,8 +10,7 @@ struct SETTINGS {
     int oldiConfig = 0;
 
     struct {
-
-        bool Enable = true;
+        int Enable = 1;
         bool SaveTarget = true;
         bool RecoilControl = true;
         bool AimLock = true;
@@ -38,9 +37,32 @@ struct SETTINGS {
 
     struct {
 
-        //bool SpectatorCount = true;
-        //bool RingHelper = true;
-        //bool Thirdperson = true;
+        bool Enable = true;
+        bool WhileADS = true;
+        bool IgnoreKnocked = true;
+        bool ByKey = true;
+        int MaxDistance = 600;
+        int Delay = 50;
+
+    }TriggerBot;
+
+    struct {
+        bool FakeDuck = false;
+        bool Bhop = false;
+        bool SuperGrappler = false;
+        bool FreeCam = false;
+        bool SuperGlide = false;
+        int SuperGlideType = 0;
+        int SuperGlideMode = 0;
+        bool FastMovement = false;
+        bool SkinChanger = false;
+        int SkinID = 1;
+        bool SpectatorCount = true;
+        bool SpectatorList = true;
+        bool WallJump = true;
+        bool RapidFire = true;
+        int RapidFireDelay = 75;
+
     }Misc;
 
     struct {
@@ -78,7 +100,9 @@ struct SETTINGS {
             float FontSize = 16.f;
 
             bool Glow = true;
-            int GlowType = 0;
+            int GlowRadius = 64;
+            int BodyStyle = 15;
+            int OutlineStyle = 1;
 
             bool HeadCircle = true;
             bool OutScreen = true;
@@ -115,7 +139,7 @@ struct SETTINGS {
             bool Enable = true;
             int MaxDistance = 800;
             int PositionX = 10;
-            int PositionY = 30;
+            int PositionY = 40;
             int Zoom = 10;
             int Size = 200;
 
@@ -141,6 +165,14 @@ struct SETTINGS {
         }Visuals;
 
         int Menu = VK_INSERT;
+        int Bhop = VK_SPACE;
+        int FakeDuck = 0x5A;
+        int FreeCam = 0x58;
+        int SuperGlide = 0x57;
+        int SuperGrappler = 0x51;
+        int Trigger = VK_XBUTTON1;
+        int RapidFire = VK_XBUTTON2;
+        int WallJump = 0x58;
 
     }Keys;
 
@@ -175,8 +207,8 @@ struct SETTINGS {
     struct {
         int Language = 0;
         bool FeaturesDefinition = true;
+        int FontStyle = 0;
     }Configs;
 };
-
 
 #endif
