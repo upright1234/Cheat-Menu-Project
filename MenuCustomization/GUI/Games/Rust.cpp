@@ -334,6 +334,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                     elements::checkbox(("SwayControl"), &Settings->Misc.SwayControl);
                     elements::checkbox(("BulletSpeed"), &Settings->Misc.BulletSpeed);
                     elements::checkbox(("FullAuto"), &Settings->Misc.FullAuto);
+                    elements::checkbox(("SuperBow"), &Settings->Misc.SuperBow);
                     elements::checkbox(("InstantEoka"), &Settings->Misc.InstantEoka);
                     elements::checkbox(("ShootAir"), &Settings->Misc.ShootAir);
                     elements::checkbox(("Extended Melee"), &Settings->Misc.ExtendedMelee);

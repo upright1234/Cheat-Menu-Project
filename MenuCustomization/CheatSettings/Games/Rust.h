@@ -54,12 +54,13 @@ struct SETTINGS {
         bool InstantEoka = false;
         bool ShootAir = false;
         bool ExtendedMelee = false;
+        bool SuperBow = false;
         bool GravityMultiplier = false;
         bool NoFall = false;
         bool Spiderman = false;
         bool HighJump = false;
 
-        bool AdminFlag = true;
+        bool AdminFlag = false;
         bool AdminByHold = false;
         bool FovChanger = false;
         float FovChangerValue = 150.f;
