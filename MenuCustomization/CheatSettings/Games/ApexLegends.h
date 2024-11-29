@@ -166,6 +166,7 @@ struct SETTINGS {
 
         int Menu = VK_INSERT;
         int Bhop = VK_SPACE;
+        int Jump = VK_SPACE;
         int FakeDuck = 0x5A;
         int FreeCam = 0x58;
         int SuperGlide = 0x57;
