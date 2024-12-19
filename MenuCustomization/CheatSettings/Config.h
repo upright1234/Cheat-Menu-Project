@@ -11,8 +11,8 @@
 #define IsXDefiant 0
 #define IsPUBG 1
 
-void CreateConfig(char* config_name = NULL);
 void InitPath(char* config_name = NULL);
+void CreateConfig(char* config_name = NULL);
 void Read();
 void Save();
 void ParseConfigs();
@@ -26,5 +26,5 @@ struct CConfig
     std::string szConfigs;
     std::vector<std::string> vecConfigs;
     std::string pathname;
-    decltype (&CreateConfig)(CreateConfig);
+    decltype (&CreateConfig)(CreateConfig); 
 };

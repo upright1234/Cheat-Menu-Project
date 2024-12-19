@@ -72,9 +72,6 @@
     <ClCompile Include="GUI\Games\Valorant.cpp">
       <Filter>GUI\Games</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Games\XDefiant.cpp">
-      <Filter>GUI\Games</Filter>
-    </ClCompile>
     <ClCompile Include="GUI\Games\PUBG.cpp">
       <Filter>GUI\Games</Filter>
     </ClCompile>

@@ -167,7 +167,6 @@
     <ClCompile Include="GUI\Games\PUBG.cpp" />
     <ClCompile Include="GUI\Games\Rust.cpp" />
     <ClCompile Include="GUI\Games\Valorant.cpp" />
-    <ClCompile Include="GUI\Games\XDefiant.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
     <ClCompile Include="GUI\nav_elements.cpp" />
     <ClCompile Include="Imgui\imgui.cpp" />

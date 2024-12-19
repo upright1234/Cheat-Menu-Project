@@ -359,16 +359,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
 
                     elements::input_text(("Config Name"), cfgname, 30);
                     if (elements::button(("New Config"), ImVec2(ImGui::CalcItemWidth() - 20, 33), false)) {
-                        std::string cfstring = cfgname;
-                        std::string name = g_pConfig->pathname + "\\";
-                        std::string cfgpath = name + cfstring + std::string((".PUBG"));
-                        std::ofstream outfile(cfgpath);
-                        outfile << " " << std::endl;
-                        outfile.close();
-                        g_pConfig->ParseConfigs();
-                        std::string cfstring2 = cfstring;
-                        g_pConfig->InitPath((char*)cfstring2.c_str());
-                        g_pConfig->Save();
+                        g_pConfig->CreateConfig(cfgname);
                     }
                 }
                 elements::endchild();
