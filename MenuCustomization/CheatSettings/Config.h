@@ -4,14 +4,15 @@
 #include <vector>
 
 #define IsApex 0
-#define IsFortnite 1
+#define IsFortnite 0
 #define IsMW3 0
 #define IsRust 0
 #define IsValorant 0
 #define IsXDefiant 0
-#define IsPUBG 0
+#define IsPUBG 1
 
-void InitPath(char *config_name = NULL);
+void CreateConfig(char* config_name = NULL);
+void InitPath(char* config_name = NULL);
 void Read();
 void Save();
 void ParseConfigs();
@@ -25,4 +26,5 @@ struct CConfig
     std::string szConfigs;
     std::vector<std::string> vecConfigs;
     std::string pathname;
+    decltype (&CreateConfig)(CreateConfig);
 };

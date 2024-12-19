@@ -471,7 +471,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                     if (elements::button(("New Config"), ImVec2(ImGui::CalcItemWidth() - 20, 33), false)) {
                         std::string cfstring = cfgname;
                         std::string name = g_pConfig->pathname + "\\";
-                        std::string cfgpath = name + cfstring;
+                        std::string cfgpath = name + cfstring + std::string((".PUBG"));
                         std::ofstream outfile(cfgpath);
                         outfile << " " << std::endl;
                         outfile.close();
