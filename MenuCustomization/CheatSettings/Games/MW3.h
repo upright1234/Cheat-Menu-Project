@@ -15,6 +15,9 @@ struct SETTINGS {
     struct {
 
         bool Enable = true;
+        int SelectType = 0;  // by fov = 0, by distance = 1
+        bool Bots = true;
+        bool Zombies = true;
         bool SaveTarget = true;
         bool AimLock = false;
         bool VisibilityCheck = true;
@@ -98,6 +101,58 @@ struct SETTINGS {
 
         struct {
             bool Enable = true;
+
+            int MaxDistance = 800;
+            float FontSize = 16.f;
+
+            bool Box = true;
+            int BoxType = 0;
+            float BoxThickness = 1.f;
+
+            bool Lines = true;
+            int LinesPosition = 0;
+            float LinesThickness = 1.f;
+
+            bool Health = true;
+            int HealthType = 0;
+            float HealthThickness = 4.f;
+
+            bool Skeleton = true;
+            float SkeletonThickness = 2.f;
+
+            bool NickName = true;
+            bool Distance = true;
+            bool HeadCircle = true;
+
+            bool OutScreen = true;
+            int OutScreenType = 0;
+            int OutScreenFov = 15;
+            float OutScreenThickness = 2.f;
+            int OutScreenSize = 10.f;
+
+        }Bots;
+
+        struct {
+            bool Enable = true;
+
+            int MaxDistance = 800;
+            float FontSize = 16.f;
+
+            bool Box = true;
+            int BoxType = 0;
+            float BoxThickness = 1.f;
+
+            bool Lines = true;
+            int LinesPosition = 0;
+            float LinesThickness = 1.f;
+
+            bool NickName = true;
+            bool Distance = true;
+            bool HeadCircle = true;
+        }Zombies;
+
+        struct {
+            bool Enable = true;
             int PositionX = 40;
             int PositionY = 30;
             int Size = 200;
@@ -113,6 +168,7 @@ struct SETTINGS {
         struct {
             int HoldPrimary = VK_LBUTTON;
             int HoldSecondary = VK_RBUTTON;
+            int HoldZombie = VK_RBUTTON;
 
             int SwitchToHead = VK_SHIFT;
             int Toggle = VK_F6;
@@ -120,9 +176,9 @@ struct SETTINGS {
 
         struct {
             int TogglePlayers = VK_F7;
-            int ToggleBots = VK_F7;
-            int ToggleItems = VK_F8;
-            int ToggleRadar = VK_F9;
+            int ToggleZombies = VK_F8;
+            int ToggleItems = VK_F9;
+            int ToggleRadar = VK_F10;
         }Visuals;
 
         int Menu = VK_INSERT;
@@ -149,6 +205,13 @@ struct SETTINGS {
             float NickName[3] = { 1.f, 1.f, 1.f };
             float Distance[3] = { 1.f, 1.f, 1.f };
         }Bots;
+
+        struct {
+            float Visible[3] = { 1.f, 1.f, 1.f };
+            float NonVisible[3] = { 1.f, 1.f, 1.f };
+            float NickName[3] = { 1.f, 1.f, 1.f };
+            float Distance[3] = { 1.f, 1.f, 1.f };
+        }Zombies;
 
         struct {
             float Enemies[3] = { 1.f, 0.f, 0.f };
