@@ -52,11 +52,17 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
 
             if (elements::tab(icons, 2 == tabs, "B##2", ImVec2(50, 40))) tabs = 2;
 
-            if (elements::tab(icons, 3 == tabs, "E", ImVec2(50, 40))) tabs = 3;
+            if (elements::tab(icons, 3 == tabs, "B##1", ImVec2(50, 40))) tabs = 3;
 
-            if (elements::tab(icons, 4 == tabs, "C", ImVec2(50, 40))) tabs = 4;
+            if (elements::tab(icons, 4 == tabs, "B##2", ImVec2(50, 40))) tabs = 4;
 
-            if (elements::tab(icons, 5 == tabs, "D", ImVec2(50, 40))) tabs = 5;
+            if (elements::tab(icons, 5 == tabs, "E", ImVec2(50, 40))) tabs = 5;
+
+            if (elements::tab(icons, 6 == tabs, "C", ImVec2(50, 40))) tabs = 6;
+
+            if (elements::tab(icons, 7 == tabs, "C##2", ImVec2(50, 40))) tabs = 7;
+
+            if (elements::tab(icons, 8 == tabs, "D", ImVec2(50, 40))) tabs = 8;
 
         }
         ImGui::EndGroup();
@@ -79,6 +85,8 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                 {
                     elements::checkbox(("Enable Aimbot"), &Settings->Aimbot.Enable);
                     elements::checkbox(("Save Target"), &Settings->Aimbot.SaveTarget);
+                    elements::checkbox(("Focus Bots"), &Settings->Aimbot.Bots);
+                    elements::checkbox(("Focus Zombies"), &Settings->Aimbot.Bots);
                     elements::checkbox(("Aim Lock"), &Settings->Aimbot.AimLock);
                     elements::checkbox(("Visibility Check"), &Settings->Aimbot.VisibilityCheck);
                     elements::checkbox(("Ignore Knocked Players"), &Settings->Aimbot.IgnoreKnocked);
@@ -156,6 +164,86 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
 
             ImGui::BeginGroup();
             {
+                elements::beginchild("Bots #1", ImVec2(305, 433), true);
+                {
+                    elements::checkbox(("Enable Bots"), &Settings->Visuals.Bots.Enable);
+                    elements::checkbox(("Head Circle"), &Settings->Visuals.Bots.HeadCircle);
+                    elements::checkbox(("OutScreen"), &Settings->Visuals.Bots.OutScreen);
+                    elements::checkbox(("Nickname"), &Settings->Visuals.Bots.NickName);
+                    elements::checkbox(("Distance"), &Settings->Visuals.Bots.Distance);
+                    elements::checkbox(("Box"), &Settings->Visuals.Bots.Box);
+                    elements::checkbox(("Lines"), &Settings->Visuals.Bots.Lines);
+                    elements::checkbox(("Health"), &Settings->Visuals.Bots.Health);
+                    elements::checkbox(("Skeleton"), &Settings->Visuals.Bots.Skeleton);
+                }
+                elements::endchild();
+
+            }
+            ImGui::EndGroup();
+
+            ImGui::SameLine();
+
+            ImGui::BeginGroup();
+            {
+                elements::beginchild("Bots #2", ImVec2(305, 433), true);
+                {
+                    elements::sliderint(("Max. Distance##ESP"), &Settings->Visuals.Bots.MaxDistance, 0, 1000);
+                    elements::sliderfloat(("Font Size"), &Settings->Visuals.Bots.FontSize, 10.0f, 25.0f);
+                    elements::sliderfloat(("Skeleton Thickness"), &Settings->Visuals.Bots.SkeletonThickness, 1.0f, 5.0f);
+                    elements::combo(("Box Type"), &Settings->Visuals.Bots.BoxType, boxes, IM_ARRAYSIZE(boxes), 2);
+                    elements::sliderfloat(("Box Thickness"), &Settings->Visuals.Bots.BoxThickness, 1.0f, 5.0f);
+                    elements::combo(("Lines Position"), &Settings->Visuals.Bots.LinesPosition, LinesTypes, IM_ARRAYSIZE(LinesTypes), 3);
+                    elements::sliderfloat(("Lines Thickness"), &Settings->Visuals.Bots.LinesThickness, 1.0f, 5.0f);
+                    elements::combo(("Health Type"), &Settings->Visuals.Bots.HealthType, HealthTypes, IM_ARRAYSIZE(HealthTypes), 2);
+                    elements::sliderfloat(("Health Thickness"), &Settings->Visuals.Bots.HealthThickness, 1.0f, 5.0f);
+                }
+                elements::endchild();
+
+            }
+            ImGui::EndGroup();
+
+        }
+        else if (active_tab == 3) {
+
+            ImGui::BeginGroup();
+            {
+                elements::beginchild("Zombies #1", ImVec2(305, 433), true);
+                {
+                    elements::checkbox(("Enable Zombies"), &Settings->Visuals.Zombies.Enable);
+                    elements::checkbox(("Head Circle"), &Settings->Visuals.Zombies.HeadCircle);
+                    elements::checkbox(("Nickname"), &Settings->Visuals.Zombies.NickName);
+                    elements::checkbox(("Distance"), &Settings->Visuals.Zombies.Distance);
+                    elements::checkbox(("Box"), &Settings->Visuals.Zombies.Box);
+                    elements::checkbox(("Lines"), &Settings->Visuals.Zombies.Lines);
+                }
+                elements::endchild();
+
+            }
+            ImGui::EndGroup();
+
+            ImGui::SameLine();
+
+            ImGui::BeginGroup();
+            {
+                elements::beginchild("Zombies #2", ImVec2(305, 433), true);
+                {
+                    elements::sliderint(("Max. Distance##ESP"), &Settings->Visuals.Zombies.MaxDistance, 0, 1000);
+                    elements::sliderfloat(("Font Size"), &Settings->Visuals.Zombies.FontSize, 10.0f, 25.0f);
+                    elements::combo(("Box Type"), &Settings->Visuals.Zombies.BoxType, boxes, IM_ARRAYSIZE(boxes), 2);
+                    elements::sliderfloat(("Box Thickness"), &Settings->Visuals.Zombies.BoxThickness, 1.0f, 5.0f);
+                    elements::combo(("Lines Position"), &Settings->Visuals.Zombies.LinesPosition, LinesTypes, IM_ARRAYSIZE(LinesTypes), 3);
+                    elements::sliderfloat(("Lines Thickness"), &Settings->Visuals.Zombies.LinesThickness, 1.0f, 5.0f);
+                }
+                elements::endchild();
+
+            }
+            ImGui::EndGroup();
+
+            }
+        else if (active_tab == 4) {
+
+            ImGui::BeginGroup();
+            {
                 elements::beginchild("Items #1", ImVec2(305, 433), true);
                 {
                     elements::checkbox(("Enable Items"), &Settings->Visuals.Items.Enable);
@@ -195,7 +283,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
             ImGui::EndGroup();
 
         }
-        else if (active_tab == 3) {
+        else if (active_tab == 5) {
 
             ImGui::BeginGroup();
             {
@@ -232,11 +320,11 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
             ImGui::EndGroup();
 
         }
-        else if (active_tab == 4) {
+        else if (active_tab == 6) {
 
             ImGui::BeginGroup();
             {
-                elements::beginchild("Aim #1", ImVec2(305, 433), true);
+                elements::beginchild("Aim", ImVec2(305, 433), true);
                 {
                     ImGui::ColorEdit4(("Aim Fov"), (float*)&Settings->Colors.Aimbot.Fov, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 
@@ -253,13 +341,15 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
 
             ImGui::BeginGroup();
             {
-                elements::beginchild("Visuals #2", ImVec2(305, 433), true);
+                elements::beginchild("Players", ImVec2(305, 433), true);
                 {
                     ImGui::ColorEdit4(("Player Visible"), (float*)&Settings->Colors.Players.Visible, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 
                     ImGui::ColorEdit4(("Player Non Visible"), (float*)&Settings->Colors.Players.NonVisible, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
                     
                     ImGui::ColorEdit4(("Player NickName"), (float*)&Settings->Colors.Players.NickName, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+                   
+                    ImGui::ColorEdit4(("Player Distance"), (float*)&Settings->Colors.Players.Distance, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
                     
                     ImGui::ColorEdit4(("Radar Visible"), (float*)&Settings->Colors.Radar.Visible, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
 
@@ -272,7 +362,46 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
             ImGui::EndGroup();
 
         }
-        else if (active_tab == 5) {
+        else if (active_tab == 7) {
+
+            ImGui::BeginGroup();
+            {
+                elements::beginchild("Bots", ImVec2(305, 433), true);
+                {
+                    ImGui::ColorEdit4(("Bots Visible"), (float*)&Settings->Colors.Players.Visible, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
+                    ImGui::ColorEdit4(("Bots Non Visible"), (float*)&Settings->Colors.Players.NonVisible, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
+                    ImGui::ColorEdit4(("Bots NickName"), (float*)&Settings->Colors.Players.NickName, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+                    
+                    ImGui::ColorEdit4(("Bots Distance"), (float*)&Settings->Colors.Players.Distance, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+                }
+                elements::endchild();
+
+            }
+            ImGui::EndGroup();
+
+            ImGui::SameLine();
+
+            ImGui::BeginGroup();
+            {
+                elements::beginchild("Zombies", ImVec2(305, 433), true);
+                {
+                    ImGui::ColorEdit4(("Zombies Visible"), (float*)&Settings->Colors.Zombies.Visible, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
+                    ImGui::ColorEdit4(("Zombies Non Visible"), (float*)&Settings->Colors.Zombies.NonVisible, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
+                    ImGui::ColorEdit4(("Zombies NickName"), (float*)&Settings->Colors.Zombies.NickName, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+
+                    ImGui::ColorEdit4(("Zombies Distance"), (float*)&Settings->Colors.Zombies.Distance, ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_NoInputs);
+                }
+                elements::endchild();
+
+            }
+            ImGui::EndGroup();
+
+            }
+        else if (active_tab == 8) {
 
             ImGui::BeginGroup();
             {
@@ -281,9 +410,11 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                     elements::HotKey(("Cheat Menu Key"), &Settings->Keys.Menu, { 142, 29 });
                     elements::HotKey(("Aimbot Hold Primary"), &Settings->Keys.Aimbot.HoldPrimary, { 142, 29 });
                     elements::HotKey(("Aimbot Hold Secondary"), &Settings->Keys.Aimbot.HoldSecondary, { 142, 29 });
+                    elements::HotKey(("Aimbot Hold Zombies"), &Settings->Keys.Aimbot.HoldZombie, { 142, 29 });
                     elements::HotKey(("Aimbot Switch To Head"), &Settings->Keys.Aimbot.SwitchToHead, { 142, 29 });
                     elements::HotKey(("Aimbot Toggle"), &Settings->Keys.Aimbot.Toggle, { 142, 29 });
                     elements::HotKey(("Visuals Toggle Players"), &Settings->Keys.Visuals.TogglePlayers, { 142, 29 });
+                    elements::HotKey(("Visuals Toggle Zombies"), &Settings->Keys.Visuals.ToggleZombies, { 142, 29 });
                     elements::HotKey(("Visuals Toggle Items"), &Settings->Keys.Visuals.ToggleItems, { 142, 29 });
                     elements::HotKey(("Visuals Toggle Radar"), &Settings->Keys.Visuals.ToggleRadar, { 142, 29 });
                 }
