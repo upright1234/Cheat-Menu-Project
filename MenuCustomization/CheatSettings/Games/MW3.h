@@ -15,7 +15,7 @@ struct SETTINGS {
     struct {
 
         bool Enable = true;
-        int SelectType = 0;
+        int SelectType = 0;  // by fov = 0, by distance = 1
         bool Bots = true;
         bool Zombies = true;
         bool SaveTarget = true;
@@ -169,7 +169,7 @@ struct SETTINGS {
             int HoldPrimary = VK_LBUTTON;
             int HoldSecondary = VK_RBUTTON;
             int HoldZombie = VK_RBUTTON;
-            
+
             int SwitchToHead = VK_SHIFT;
             int Toggle = VK_F6;
         }Aimbot;
