@@ -158,7 +158,6 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                     elements::checkbox(("Nickname"), &Settings->Visuals.Players.NickName);
                     elements::checkbox(("Distance"), &Settings->Visuals.Players.Distance);
                     elements::checkbox(("Weapon"), &Settings->Visuals.Players.Weapon);
-                    elements::checkbox(("Chams"), &Settings->Visuals.Players.Chams);
                     elements::checkbox(("HotBar"), &Settings->Visuals.Players.HotBar);
                     
                 }
@@ -324,25 +323,14 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
             {
                 elements::beginchild("Misc", ImVec2(305, 433), true);
                 {
-                    elements::checkbox(("Silent"), &Settings->Misc.Silent);
-                    elements::sliderint(("Silent Hit Chance"), &Settings->Misc.SilentHitChance, 1, 100);
-                    elements::sliderint(("Silent HS Chance"), &Settings->Misc.SilentHeadShotChance, 1, 100);
                     elements::checkbox(("Attack On Mountable"), &Settings->Misc.AttackOnMountable);
                     elements::checkbox(("Recoil Control"), &Settings->Misc.RecoilControl);
                     elements::sliderint(("Recoil Scale"), &Settings->Misc.RecoilScale, 1, 100);
-                    elements::checkbox(("SpreadControl"), &Settings->Misc.SpreadControl);
-                    elements::checkbox(("SwayControl"), &Settings->Misc.SwayControl);
                     elements::checkbox(("BulletSpeed"), &Settings->Misc.BulletSpeed);
                     elements::checkbox(("FullAuto"), &Settings->Misc.FullAuto);
                     elements::checkbox(("SuperBow"), &Settings->Misc.SuperBow);
                     elements::checkbox(("InstantEoka"), &Settings->Misc.InstantEoka);
-                    elements::checkbox(("ShootAir"), &Settings->Misc.ShootAir);
                     elements::checkbox(("Extended Melee"), &Settings->Misc.ExtendedMelee);
-                    elements::checkbox(("Gravity Multiplier"), &Settings->Misc.GravityMultiplier);
-                    elements::checkbox(("No Fall"), &Settings->Misc.NoFall);
-                    elements::checkbox(("Spiderman"), &Settings->Misc.Spiderman);
-                    elements::checkbox(("High Jump"), &Settings->Misc.HighJump);
-                    elements::checkbox(("Admin Flag"), &Settings->Misc.AdminFlag);
                     elements::checkbox(("Third Person"), &Settings->Misc.ThirdPerson);
                     elements::checkbox(("Bright Night"), &Settings->Misc.nightSky);
                     elements::checkbox(("Time Change"), &Settings->Misc.night_mode);
@@ -432,8 +420,6 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                 {
                     elements::HotKey(("Cheat Menu Key"), &Settings->Keys.Menu, { 142, 29 });
                     elements::HotKey(("Zoom Hold"), &Settings->Keys.ZoomFovHold, { 142, 29 });
-                    elements::HotKey(("Admin Flag Key"), &Settings->Keys.AdminFlag, { 142, 29 });
-                    elements::HotKey(("Admin Flag Hold"), &Settings->Keys.AdminFlagHold, { 142, 29 });
 
                     elements::HotKey(("Aimbot Hold Primary"), &Settings->Keys.Aimbot.HoldPrimary, { 142, 29 });
                     elements::HotKey(("Aimbot Hold Secondary"), &Settings->Keys.Aimbot.HoldSecondary, { 142, 29 });

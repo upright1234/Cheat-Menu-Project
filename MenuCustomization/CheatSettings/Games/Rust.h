@@ -41,27 +41,15 @@ struct SETTINGS {
     }Aimbot;
 
     struct {
-        bool Silent = false;
-        int SilentHitChance = 100;
-        int SilentHeadShotChance = 100;
         bool AttackOnMountable = false;
         bool RecoilControl = false;
         int RecoilScale = 10;
-        bool SpreadControl = false;
-        bool SwayControl = false;
         bool BulletSpeed = false;
         bool FullAuto = false;
         bool InstantEoka = false;
-        bool ShootAir = false;
         bool ExtendedMelee = false;
         bool SuperBow = false;
-        bool GravityMultiplier = false;
-        bool NoFall = false;
-        bool Spiderman = false;
-        bool HighJump = false;
 
-        bool AdminFlag = false;
-        bool AdminByHold = false;
         bool FovChanger = false;
         float FovChangerValue = 150.f;
         bool ThirdPerson = false;
@@ -95,10 +83,6 @@ struct SETTINGS {
             int BoxType = 0;
             float BoxThickness = 1.f;
 
-            bool Health = true;
-            int HealthType = 0;
-            float HealthThickness = 4.f;
-
             bool Lines = true;
             int LinesPosition = 0;
             float LinesThickness = 1.f;
@@ -113,9 +97,6 @@ struct SETTINGS {
             int HotBarX = 300;
             int HotBarY = 20;
             float HotBarFontSize = 16.f;
-
-            bool Chams = true;
-
         }Players;
 
         struct {
@@ -204,8 +185,6 @@ struct SETTINGS {
         }Visuals;
 
         int Menu = VK_INSERT;
-        int AdminFlag = VK_F3;
-        int AdminFlagHold = VK_F5;
         int ZoomFovHold = VK_XBUTTON2;
 
     }Keys;
@@ -259,5 +238,6 @@ struct SETTINGS {
         int FontStyle = 0;
     }Configs;
 };
+
 
 #endif

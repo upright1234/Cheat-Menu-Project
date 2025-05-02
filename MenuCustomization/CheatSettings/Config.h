@@ -5,8 +5,8 @@
 
 #define IsApex 0
 #define IsFortnite 0
-#define IsMW3 1
-#define IsRust 0
+#define IsMW3 0
+#define IsRust 1
 #define IsValorant 0
 #define IsXDefiant 0
 #define IsPUBG 0
