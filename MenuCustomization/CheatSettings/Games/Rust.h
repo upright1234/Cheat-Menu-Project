@@ -239,5 +239,4 @@ struct SETTINGS {
     }Configs;
 };
 
-
 #endif
