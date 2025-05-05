@@ -348,6 +348,8 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
             {
                 elements::beginchild("Configs", ImVec2(305, 433), true);
                 {
+                    elements::checkbox("Instant Switch", &Settings->Misc.InstantSwitch);
+                    elements::checkbox("Aim While Jumping", &Settings->Misc.AimWhileJumping);
                     if (elements::combo(("Select Your Config"), &Settings->iConfig, g_pConfig->szConfigs.c_str(), g_pConfig->szConfigs.size())) {
                         if (Settings->oldiConfig != Settings->iConfig) {
                             g_pConfig->InitPath(&g_pConfig->vecConfigs[Settings->oldiConfig][0u]);
