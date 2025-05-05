@@ -92,6 +92,7 @@ struct SETTINGS {
             bool Ammo = true;
             bool Weapon = true;
             bool Consumable = true;
+            bool Material = true;
             bool SupplyDrop = true;
 
             int Rarity = 0;

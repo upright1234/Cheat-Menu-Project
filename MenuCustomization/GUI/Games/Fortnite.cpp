@@ -215,6 +215,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                     elements::checkbox(("Ammo"), &Settings->Visuals.World.Ammo);
                     elements::checkbox(("Weapon"), &Settings->Visuals.World.Weapon);
                     elements::checkbox(("Consumable"), &Settings->Visuals.World.Consumable);
+                    elements::checkbox(("Material"), &Settings->Visuals.World.Material);
                     elements::checkbox(("Supply Drop"), &Settings->Visuals.World.SupplyDrop);
                 }
                 elements::endchild();
