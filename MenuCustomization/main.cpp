@@ -80,7 +80,7 @@ void LoadKeys()
 	io.MouseDown[3] = GetAsyncKeyState(VK_XBUTTON1) & 0x8000;
 	io.MouseDown[4] = GetAsyncKeyState(VK_XBUTTON2) & 0x8000;
 
-	for (auto i = 0x08; i <= 0xA5; i++)
+	/*for (auto i = 0x08; i <= 0xA5; i++)
 	{
 		auto key = ImGui_ImplWin32_VirtualKeyToImGuiKey(i);
 		if (key != ImGuiKey_None)
@@ -115,7 +115,7 @@ void LoadKeys()
 				io.AddInputCharacter(i + 32);
 			}
 		}
-	}
+	}*/
 
 	if ((GetKeyState(VK_LEFT) & 0x8000) != 0)
 	{
@@ -142,7 +142,7 @@ bool InitializeMenu(HWND Window, ID3D11Device *g_pd3dDevice, ID3D11DeviceContext
 	ImGui::CreateContext();
 	InitMyMenu(g_pd3dDevice);
 
-	auto ret = ImGui_ImplWin32_Init(Window);
+	auto ret = ImGui_ImplWin32_Init(Window, Window);
 	if (!ret)
 		return false;
 
@@ -154,7 +154,7 @@ bool InitializeMenu(HWND Window, ID3D11Device *g_pd3dDevice, ID3D11DeviceContext
 void RenderMenu(bool *ShowMenu, int GameX, int GameY, int GameWidth, int GameHeight, SETTINGS *Settings, CConfig *g_pConfig)
 {
 	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
+	ImGui_ImplWin32_NewFrame(ShowMenu);
 	ImGui::NewFrame();
 
 	LoadKeys();

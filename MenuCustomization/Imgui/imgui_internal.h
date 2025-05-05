@@ -134,6 +134,7 @@ struct ImGuiPopupData;              // Storage for current popup stack
 struct ImGuiSettingsHandler;        // Storage for one type registered in the .ini file
 struct ImGuiStackSizes;             // Storage of stack sizes for debugging/asserting
 struct ImGuiStyleMod;               // Stacked style modifier, backup of modified data so we can restore it
+struct ImGuiStyleShadowTexConfig;   // Shadow Texture baking config
 struct ImGuiTabBar;                 // Storage for a tab bar
 struct ImGuiTabItem;                // Storage for a tab item (within a tab bar)
 struct ImGuiTable;                  // Storage for a table
@@ -466,6 +467,7 @@ static inline ImVec4 ImLerp(const ImVec4& a, const ImVec4& b, float t)          
 static inline float  ImSaturate(float f)                                        { return (f < 0.0f) ? 0.0f : (f > 1.0f) ? 1.0f : f; }
 static inline float  ImLengthSqr(const ImVec2& lhs)                             { return (lhs.x * lhs.x) + (lhs.y * lhs.y); }
 static inline float  ImLengthSqr(const ImVec4& lhs)                             { return (lhs.x * lhs.x) + (lhs.y * lhs.y) + (lhs.z * lhs.z) + (lhs.w * lhs.w); }
+static inline float  ImLength(const ImVec2& lhs, float fail_value)              { float d = (lhs.x * lhs.x) + (lhs.y * lhs.y); if (d > 0.0f) return ImSqrt(d); return fail_value; }
 static inline float  ImInvLength(const ImVec2& lhs, float fail_value)           { float d = (lhs.x * lhs.x) + (lhs.y * lhs.y); if (d > 0.0f) return ImRsqrt(d); return fail_value; }
 static inline float  ImFloor(float f)                                           { return (float)(int)(f); }
 static inline float  ImFloorSigned(float f)                                     { return (float)((f >= 0 || (float)(int)f == f) ? (int)f : (int)f - 1); } // Decent replacement for floorf()
@@ -769,6 +771,9 @@ struct IMGUI_API ImDrawListSharedData
     float           ArcFastRadiusCutoff;                        // Cutoff radius after which arc drawing will fallback to slower PathArcTo()
     ImU8            CircleSegmentCounts[64];    // Precomputed segment count for given radius before we calculate it dynamically (to avoid calculation overhead)
     const ImVec4*   TexUvLines;                 // UV of anti-aliased lines in the atlas
+
+    int*            ShadowRectIds;              // IDs of rects for shadow texture (2 entries)
+    const ImVec4*   ShadowRectUvs;              // UV coordinates for shadow texture (10 entries)
 
     ImDrawListSharedData();
     void SetCircleTessellationMaxError(float max_error);
@@ -1943,6 +1948,11 @@ struct ImGuiContext
     ImFont                  InputTextPasswordFont;
     ImGuiID                 TempInputId;                        // Temporary text input when CTRL+clicking on a slider, etc.
     ImGuiColorEditFlags     ColorEditOptions;                   // Store user options for color edit widgets
+    ImGuiID                 ColorEditCurrentID;                 // Set temporarily while inside of the parent-most ColorEdit4/ColorPicker4 (because they call each others).
+    ImGuiID                 ColorEditSavedID;                   // ID we are saving/restoring HS for
+    float                   ColorEditSavedHue;                  // Backup of last Hue associated to LastColor, so we can restore Hue in lossy RGB<>HSV round trips
+    float                   ColorEditSavedSat;                  // Backup of last Saturation associated to LastColor, so we can restore Saturation in lossy RGB<>HSV round trips
+    ImU32                   ColorEditSavedColor;                // RGB value with alpha set to 0.
     float                   ColorEditLastHue;                   // Backup of last Hue associated to LastColor, so we can restore Hue in lossy RGB<>HSV round trips
     float                   ColorEditLastSat;                   // Backup of last Saturation associated to LastColor, so we can restore Saturation in lossy RGB<>HSV round trips
     ImU32                   ColorEditLastColor;                 // RGB value with alpha set to 0.
@@ -3072,6 +3082,8 @@ namespace ImGui
 
     // Widgets
     IMGUI_API void          TextEx(const char* text, const char* text_end = NULL, ImGuiTextFlags flags = 0);
+    IMGUI_API bool          Tabs(bool selected, const char* icon, const char* label, const ImVec2& size_arg = ImVec2(0, 0), ImGuiButtonFlags flags = 0);
+    IMGUI_API bool          SubTab(bool selected, const char* label, const ImVec2& size_arg = ImVec2(0, 0), ImGuiButtonFlags flags = 0);
     IMGUI_API bool          ButtonEx(const char* label, const ImVec2& size_arg = ImVec2(0, 0), ImGuiButtonFlags flags = 0);
     IMGUI_API bool          ArrowButtonEx(const char* str_id, ImGuiDir dir, ImVec2 size_arg, ImGuiButtonFlags flags = 0);
     IMGUI_API bool          ImageButtonEx(ImGuiID id, ImTextureID texture_id, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, const ImVec4& bg_col, const ImVec4& tint_col);

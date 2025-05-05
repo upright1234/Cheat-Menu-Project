@@ -23,7 +23,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{35435125-455b-45ca-9b0e-2068d268d7e0}</ProjectGuid>
     <RootNamespace>Fortnite</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -136,7 +136,7 @@
       </SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <Optimization>Full</Optimization>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -161,16 +161,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GUI\Games\ApexLegends.cpp" />
-    <ClCompile Include="GUI\Games\Fortnite.cpp" />
-    <ClCompile Include="GUI\Games\MW3.cpp" />
+    <ClCompile Include="GUI\custom.cpp" />
+    <ClCompile Include="GUI\etc_element.cpp" />
     <ClCompile Include="GUI\Games\PUBG.cpp" />
-    <ClCompile Include="GUI\Games\Rust.cpp" />
-    <ClCompile Include="GUI\Games\Valorant.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
-    <ClCompile Include="GUI\nav_elements.cpp" />
     <ClCompile Include="Imgui\imgui.cpp" />
-    <ClCompile Include="Imgui\imgui_demo.cpp" />
     <ClCompile Include="Imgui\imgui_draw.cpp" />
     <ClCompile Include="Imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="Imgui\imgui_impl_win32.cpp" />
@@ -180,17 +175,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CheatSettings\Config.h" />
-    <ClInclude Include="CheatSettings\Games\ApexLegends.h" />
-    <ClInclude Include="CheatSettings\Games\Fortnite.h" />
-    <ClInclude Include="CheatSettings\Games\MW3.h" />
     <ClInclude Include="CheatSettings\Games\PUBG.h" />
-    <ClInclude Include="CheatSettings\Games\Rust.h" />
-    <ClInclude Include="CheatSettings\Games\Valorant.h" />
-    <ClInclude Include="CheatSettings\Games\XDefiant.h" />
+    <ClInclude Include="GUI\custom.hpp" />
+    <ClInclude Include="GUI\etc_element.h" />
+    <ClInclude Include="GUI\Font.h" />
     <ClInclude Include="GUI\GUI.h" />
-    <ClInclude Include="GUI\icon_font.h" />
-    <ClInclude Include="GUI\nav_elements.h" />
-    <ClInclude Include="GUI\roboto_font.h" />
+    <ClInclude Include="GUI\imgui_setting.h" />
+    <ClInclude Include="GUI\main.h" />
     <ClInclude Include="Imgui\imconfig.h" />
     <ClInclude Include="Imgui\imgui.h" />
     <ClInclude Include="Imgui\imgui_impl_dx11.h" />

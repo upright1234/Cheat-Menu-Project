@@ -66,6 +66,8 @@ Index of this file:
 #include <stdarg.h>                 // va_list, va_start, va_end
 #include <stddef.h>                 // ptrdiff_t, NULL
 #include <string.h>                 // memset, memmove, memcpy, strlen, strchr, strcpy, strcmp
+#include <vector>                 // memset, memmove, memcpy, strlen, strchr, strcpy, strcmp
+#include <string>                 // memset, memmove, memcpy, strlen, strchr, strcpy, strcmp
 
 // Define attributes of all API symbols declarations (e.g. for DLL under Windows)
 // IMGUI_API is used for core imgui functions, IMGUI_IMPL_API is used for the default backends files (imgui_impl_xxx.h)
@@ -503,6 +505,9 @@ namespace ImGui
     IMGUI_API bool          InvisibleButton(const char* str_id, const ImVec2& size, ImGuiButtonFlags flags = 0); // flexible button behavior without the visuals, frequently useful to build custom behaviors using the public api (along with IsItemActive, IsItemHovered, etc.)
     IMGUI_API bool          ArrowButton(const char* str_id, ImGuiDir dir);                  // square button with an arrow shape
     IMGUI_API bool          Checkbox(const char* label, bool* v);
+    IMGUI_API bool          Keybind(const char* label, int* key);
+    IMGUI_API bool          LightButtonEx(const char* label, const char* icos, bool selected, ImGuiButtonFlags flags);
+    IMGUI_API bool          LightButtonEx1(const char* label, const char* icos, bool selected, ImGuiButtonFlags flags);
     IMGUI_API bool          CheckboxFlags(const char* label, int* flags, int flags_value);
     IMGUI_API bool          CheckboxFlags(const char* label, unsigned int* flags, unsigned int flags_value);
     IMGUI_API bool          RadioButton(const char* label, bool active);                    // use with e.g. if (RadioButton("one", my_value==1)) { my_value = 1; }
@@ -523,6 +528,8 @@ namespace ImGui
     IMGUI_API bool          Combo(const char* label, int* current_item, const char* const items[], int items_count, int popup_max_height_in_items = -1);
     IMGUI_API bool          Combo(const char* label, int* current_item, const char* items_separated_by_zeros, int popup_max_height_in_items = -1);      // Separate items with \0 within a string, end item-list with \0\0. e.g. "One\0Two\0Three\0"
     IMGUI_API bool          Combo(const char* label, int* current_item, bool(*items_getter)(void* data, int idx, const char** out_text), void* data, int items_count, int popup_max_height_in_items = -1);
+    IMGUI_API void          MultiCombo(const char* label, bool* values, std::vector<std::string> list);
+    IMGUI_API void          MultiComboVector(const char* label, std::vector<ItemSelector>& items, std::vector<std::string>& selectedCodes);
 
     // Widgets: Drag Sliders
     // - CTRL+Click on any drag box to turn them into an input box. Manually input values aren't clamped by default and can go off-bounds. Use ImGuiSliderFlags_AlwaysClamp to always clamp.
@@ -555,7 +562,7 @@ namespace ImGui
     // - Format string may also be set to NULL or use the default format ("%f" or "%d").
     // - Legacy: Pre-1.78 there are SliderXXX() function signatures that take a final `float power=1.0f' argument instead of the `ImGuiSliderFlags flags=0' argument.
     //   If you get a warning converting a float to ImGuiSliderFlags, read https://github.com/ocornut/imgui/issues/3361
-    IMGUI_API bool          SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);     // adjust format to decorate the value with a prefix or a suffix for in-slider labels or unit display.
+    IMGUI_API bool          SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format = "%.1f", ImGuiSliderFlags flags = 0);     // adjust format to decorate the value with a prefix or a suffix for in-slider labels or unit display.
     IMGUI_API bool          SliderFloat2(const char* label, float v[2], float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
     IMGUI_API bool          SliderFloat3(const char* label, float v[3], float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
     IMGUI_API bool          SliderFloat4(const char* label, float v[4], float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
@@ -565,6 +572,9 @@ namespace ImGui
     IMGUI_API bool          SliderInt3(const char* label, int v[3], int v_min, int v_max, const char* format = "%d", ImGuiSliderFlags flags = 0);
     IMGUI_API bool          SliderInt4(const char* label, int v[4], int v_min, int v_max, const char* format = "%d", ImGuiSliderFlags flags = 0);
     IMGUI_API bool          SliderScalar(const char* label, ImGuiDataType data_type, void* p_data, const void* p_min, const void* p_max, const char* format = NULL, ImGuiSliderFlags flags = 0);
+    IMGUI_API void          BinderBox(const char* label, const char* label_v, bool* v, int* vs);
+    IMGUI_API void          ButtonBox(const char* label, const char* label_v, int* vs);
+    IMGUI_API void          CollorBox(const char* label, const char* label_v, bool* v, float* col, ImGuiColorEditFlags flags);
     IMGUI_API bool          SliderScalarN(const char* label, ImGuiDataType data_type, void* p_data, int components, const void* p_min, const void* p_max, const char* format = NULL, ImGuiSliderFlags flags = 0);
     IMGUI_API bool          VSliderFloat(const char* label, const ImVec2& size, float* v, float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
     IMGUI_API bool          VSliderInt(const char* label, const ImVec2& size, int* v, int v_min, int v_max, const char* format = "%d", ImGuiSliderFlags flags = 0);
@@ -1571,6 +1581,7 @@ enum ImGuiCol_
     ImGuiCol_NavWindowingHighlight, // Highlight window when using CTRL+TAB
     ImGuiCol_NavWindowingDimBg,     // Darken/colorize entire screen behind the CTRL+TAB window list, when active
     ImGuiCol_ModalWindowDimBg,      // Darken/colorize entire screen behind a modal window, when one is active
+    ImGuiCol_WindowShadow,          // Window shadows
     ImGuiCol_COUNT
 };
 
@@ -1871,6 +1882,9 @@ struct ImGuiStyle
     bool        AntiAliasedFill;            // Enable anti-aliased edges around filled shapes (rounded rectangles, circles, etc.). Disable if you are really tight on CPU/GPU. Latched at the beginning of the frame (copied to ImDrawList).
     float       CurveTessellationTol;       // Tessellation tolerance when using PathBezierCurveTo() without a specific number of segments. Decrease for highly tessellated curves (higher quality, more polygons), increase to reduce quality.
     float       CircleTessellationMaxError; // Maximum error (in pixels) allowed when using AddCircle()/AddCircleFilled() or drawing rounded corner rectangles with no explicit segment count specified. Decrease for higher quality but more geometry.
+    float       WindowShadowSize;           // Size (in pixels) of window shadows. Set this to zero to disable shadows.
+    float       WindowShadowOffsetDist;     // Offset distance (in pixels) of window shadows from casting window.
+    float       WindowShadowOffsetAngle;    // Offset angle of window shadows from casting window (0.0f = left, 0.5f*PI = bottom, 1.0f*PI = right, 1.5f*PI = top).
     ImVec4      Colors[ImGuiCol_COUNT];
 
     IMGUI_API ImGuiStyle();
@@ -2474,6 +2488,7 @@ enum ImDrawFlags_
     ImDrawFlags_RoundCornersAll             = ImDrawFlags_RoundCornersTopLeft | ImDrawFlags_RoundCornersTopRight | ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersBottomRight,
     ImDrawFlags_RoundCornersDefault_        = ImDrawFlags_RoundCornersAll, // Default to ALL corners if none of the _RoundCornersXX flags are specified.
     ImDrawFlags_RoundCornersMask_           = ImDrawFlags_RoundCornersAll | ImDrawFlags_RoundCornersNone,
+    ImDrawFlags_ShadowCutOutShapeBackground = 1 << 9, // Do not render the shadow shape under the objects to be shadowed to save on fill-rate or facilitate blending. Slower on CPU.
 };
 
 // Flags for ImDrawList instance. Those are set automatically by ImGui:: functions from ImGuiIO settings, and generally not manipulated directly.
@@ -2564,6 +2579,23 @@ struct ImDrawList
     IMGUI_API void  AddImageQuad(ImTextureID user_texture_id, const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const ImVec2& uv1 = ImVec2(0, 0), const ImVec2& uv2 = ImVec2(1, 0), const ImVec2& uv3 = ImVec2(1, 1), const ImVec2& uv4 = ImVec2(0, 1), ImU32 col = IM_COL32_WHITE);
     IMGUI_API void  AddImageRounded(ImTextureID user_texture_id, const ImVec2& p_min, const ImVec2& p_max, const ImVec2& uv_min, const ImVec2& uv_max, ImU32 col, float rounding, ImDrawFlags flags = 0);
 
+    // Shadows primitives
+    // [BETA] API
+    // - Add shadow for a object, with min/max or center/radius describing the object extents, and offset shifting the shadow.
+    // - Rounding parameters refer to the object itself, not the shadow!
+    // - By default, the area under the object is filled, because this is simpler to process.
+    //   Using the ImDrawFlags_ShadowCutOutShapeBackground flag makes the function not render this area and leave a hole under the object.
+    //    - Shadows w/ fill under the object: a bit faster for CPU, more pixels rendered, visible/darkening if used behind a transparent shape.
+    //      Typically used by: small, frequent objects, opaque objects, transparent objects if shadow darkening isn't an issue.
+    //    - Shadows w/ hole under the object: a bit slower for CPU, less pixels rendered, no difference if used behind a transparent shape.
+    //      Typically used by: large, infrequent objects, transparent objects if exact blending/color matter.
+    // - FIXME-SHADOWS: 'offset' + ImDrawFlags_ShadowCutOutShapeBackground are not currently supported together with AddShadowCircle(), AddShadowConvexPoly(), AddShadowNGon().
+    #define IMGUI_HAS_SHADOWS 1
+    IMGUI_API void  AddShadowRect(const ImVec2& obj_min, const ImVec2& obj_max, ImU32 shadow_col, float shadow_thickness, const ImVec2& shadow_offset, ImDrawFlags flags = 0, float obj_rounding = 0.0f);
+    IMGUI_API void  AddShadowCircle(const ImVec2& obj_center, float obj_radius, ImU32 shadow_col, float shadow_thickness, const ImVec2& shadow_offset, ImDrawFlags flags = 0, int obj_num_segments = 12);
+    IMGUI_API void  AddShadowConvexPoly(const ImVec2* points, int points_count, ImU32 shadow_col, float shadow_thickness, const ImVec2& shadow_offset, ImDrawFlags flags = 0);
+    IMGUI_API void  AddShadowNGon(const ImVec2& obj_center, float obj_radius, ImU32 shadow_col, float shadow_thickness, const ImVec2& shadow_offset, ImDrawFlags flags, int obj_num_segments);
+
     // Stateful path API, add points then finish with PathFillConvex() or PathStroke()
     // - Filled shapes must always use clockwise winding order. The anti-aliasing fringe depends on it. Counter-clockwise shapes will have "inward" anti-aliasing.
     inline    void  PathClear()                                                 { _Path.Size = 0; }
@@ -2646,6 +2678,24 @@ struct ImDrawData
 //-----------------------------------------------------------------------------
 // [SECTION] Font API (ImFontConfig, ImFontGlyph, ImFontAtlasFlags, ImFontAtlas, ImFontGlyphRangesBuilder, ImFont)
 //-----------------------------------------------------------------------------
+
+// [Internal] Shadow texture baking config
+struct ImFontAtlasShadowTexConfig
+{
+    int     TexCornerSize;          // Size of the corner areas.
+    int     TexEdgeSize;            // Size of the edge areas (and by extension the center). Changing this is normally unnecessary.
+    float   TexFalloffPower;        // The power factor for the shadow falloff curve.
+    float   TexDistanceFieldOffset; // How much to offset the distance field by (allows over/under-shadowing, potentially useful for accommodating rounded corners on the "casting" shape).
+    bool    TexBlur;                // Do we want to Gaussian blur the shadow texture?
+
+    inline ImFontAtlasShadowTexConfig() { memset(this, 0, sizeof(*this)); }
+    IMGUI_API void SetupDefaults();
+    int     GetRectTexPadding() const   { return 2; }                                                   // Number of pixels of padding to add to the rectangular texture to avoid sampling artifacts at the edges.
+    int     CalcRectTexSize() const     { return TexCornerSize + TexEdgeSize + GetRectTexPadding(); }   // The size of the texture area required for the actual 2x2 rectangle shadow texture (after the redundant corners have been removed). Padding is required here to avoid sampling artifacts at the edge adjoining the removed corners.    int     CalcConvexTexWidth() const;                                                                // The width of the texture area required for the convex shape shadow texture.
+    int     GetConvexTexPadding() const { return 8; }                                                   // Number of pixels of padding to add to the convex shape texture to avoid sampling artifacts at the edges. This also acts as padding for the expanded corner triangles.
+    int     CalcConvexTexWidth() const;                                                                 // The width of the texture area required for the convex shape shadow texture.
+    int     CalcConvexTexHeight() const;                                                                // The height of the texture area required for the convex shape shadow texture.
+};
 
 struct ImFontConfig
 {
@@ -2836,6 +2886,11 @@ struct ImFontAtlas
     // [Internal] Packing data
     int                         PackIdMouseCursors; // Custom texture rectangle ID for white pixel and mouse cursors
     int                         PackIdLines;        // Custom texture rectangle ID for baked anti-aliased lines
+
+    // [Internal] Shadow data
+    int                         ShadowRectIds[2];   // IDs of rect for shadow textures
+    ImVec4                      ShadowRectUvs[10];  // UV coordinates for shadow textures, 9 for the rectangle shadows and the final entry for the convex shape shadows
+    ImFontAtlasShadowTexConfig  ShadowTexConfig;    // Shadow texture baking config
 
     // [Obsolete]
     //typedef ImFontAtlasCustomRect    CustomRect;         // OBSOLETED in 1.72+
