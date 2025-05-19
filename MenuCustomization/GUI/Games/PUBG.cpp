@@ -733,6 +733,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
 
                 ImGui::BeginGroup();
                 {
+                    ImGui::SliderInt("Render FPS", &Settings->Configs.RenderFPS, 30, 1000);
                     ImGui::Checkbox("Spectator Count", &Settings->Configs.SpectatorCount);
                     ImGui::Combo("Render Font Style", &Settings->Configs.FontStyle, FontTypes, IM_ARRAYSIZE(FontTypes), IM_ARRAYSIZE(FontTypes));
 

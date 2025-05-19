@@ -284,6 +284,7 @@ struct SETTINGS {
         bool FeaturesDefinition = true; //ignore
         int FontStyle = 0; //0 = Verdana, 1 = Fortnite
         int GameFPS = 60; //literally your game FPS count
+        int RenderFPS = 144; //The cheat render FPS limit
         bool SpectatorCount = true;
         int MenuKey = VK_INSERT;
     }Configs;
