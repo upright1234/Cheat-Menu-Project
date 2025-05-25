@@ -529,7 +529,7 @@ namespace ImGui
     IMGUI_API bool          Combo(const char* label, int* current_item, const char* items_separated_by_zeros, int popup_max_height_in_items = -1);      // Separate items with \0 within a string, end item-list with \0\0. e.g. "One\0Two\0Three\0"
     IMGUI_API bool          Combo(const char* label, int* current_item, bool(*items_getter)(void* data, int idx, const char** out_text), void* data, int items_count, int popup_max_height_in_items = -1);
     IMGUI_API void          MultiCombo(const char* label, bool* values, std::vector<std::string> list);
-    IMGUI_API void          MultiComboVector(const char* label, std::vector<ItemSelector>& items, std::vector<std::string>& selectedCodes);
+    IMGUI_API void          MultiComboVector(const char* label, std::vector<ItemSelector>& items, std::vector<int>& selectedCodes);
 
     // Widgets: Drag Sliders
     // - CTRL+Click on any drag box to turn them into an input box. Manually input values aren't clamped by default and can go off-bounds. Use ImGuiSliderFlags_AlwaysClamp to always clamp.

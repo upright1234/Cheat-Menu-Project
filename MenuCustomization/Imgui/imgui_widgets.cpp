@@ -2517,12 +2517,12 @@ void UpdateComboItems(bool* values, std::vector<std::string> list, std::string& 
             out += vec.at(i);
     }
 }
-void ImGui::MultiComboVector(const char* label, std::vector<ItemSelector>& items, std::vector<std::string>& selectedCodes) {
+void ImGui::MultiComboVector(const char* label, std::vector<ItemSelector>& items, std::vector<int>& selectedCodes) {
     std::string preview = "";
 
     // Monta o texto do preview com base nos nomes selecionados
     for (const auto& item : items) {
-        bool anySelected = std::any_of(item.codes.begin(), item.codes.end(), [&](const std::string& code) {
+        bool anySelected = std::any_of(item.codes.begin(), item.codes.end(), [&](const int& code) {
             return std::find(selectedCodes.begin(), selectedCodes.end(), code) != selectedCodes.end();
             });
 
@@ -2535,7 +2535,7 @@ void ImGui::MultiComboVector(const char* label, std::vector<ItemSelector>& items
     ImGui::SetNextItemWidth(250.f);
     if (ImGui::BeginCombo(label, preview.c_str())) {
         for (auto& item : items) {
-            bool anySelected = std::any_of(item.codes.begin(), item.codes.end(), [&](const std::string& code) {
+            bool anySelected = std::any_of(item.codes.begin(), item.codes.end(), [&](const int& code) {
                 return std::find(selectedCodes.begin(), selectedCodes.end(), code) != selectedCodes.end();
                 });
 

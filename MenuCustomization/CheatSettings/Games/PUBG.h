@@ -209,14 +209,14 @@ struct SETTINGS {
                 int ShowType = 0; //0 by type, 1 by name
                 bool Types[10] = { false, false, false, false, false, false, false, false, false, false };
                 std::vector<ItemSelector> List;
-                std::vector<std::string> Selected;
+                std::vector<int> Selected;
                 float Color[4] = { 1.f, 0.f, 0.f, 1.f };
             }Weapon;
 
             struct {
                 bool Enable = true;
                 std::vector<ItemSelector> List;
-                std::vector<std::string> Selected;
+                std::vector<int> Selected;
                 float Color[4] = { 1.f, 0.f, 0.f, 1.f };
             }Package;
 
@@ -225,7 +225,7 @@ struct SETTINGS {
                 int ShowType = 0; //0 by type, 1 by name
                 bool Types[2] = { true, true };
                 std::vector<ItemSelector> List;
-                std::vector<std::string> Selected;
+                std::vector<int> Selected;
                 float Color[4] = { 1.f, 0.f, 0.f, 1.f };
             }Vehicle;
 
@@ -234,8 +234,8 @@ struct SETTINGS {
                 int ShowType = 0; //0 by holding, 1 by type, 2 by weapon name, 3 by name
                 bool Types[10] = { false, false, false, false, false, false, false, false, false, false };
                 std::vector<ItemSelector> List;
-                std::vector<std::string> SelectedWeapon;
-                std::vector<std::string> Selected;
+                std::vector<int> SelectedWeapon;
+                std::vector<int> Selected;
                 float Color[4] = { 1.f, 0.f, 0.f, 1.f };
             }Ammo;
 
@@ -244,36 +244,36 @@ struct SETTINGS {
                 int ShowType = 0; //0 by holding, 1 by type, 2 by weapon name, 3 by name
                 bool Types[10] = { false, false, false, false, false, false, false, false, false, false };
                 std::vector<ItemSelector> List;
-                std::vector<std::string> SelectedWeapon;
-                std::vector<std::string> Selected;
+                std::vector<int> SelectedWeapon;
+                std::vector<int> Selected;
                 float Color[4] = { 1.f, 0.f, 0.f, 1.f };
             }Attachment;
 
             struct {
                 bool Enable = true;
                 std::vector<ItemSelector> List;
-                std::vector<std::string> Selected;
+                std::vector<int> Selected;
                 float Color[4] = { 1.f, 0.f, 0.f, 1.f };
             }Throwables;
 
             struct {
                 bool Enable = true;
                 std::vector<ItemSelector> List;
-                std::vector<std::string> Selected;
+                std::vector<int> Selected;
                 float Color[4] = { 1.f, 0.f, 0.f, 1.f };
             }Medicine;
 
             struct {
                 bool Enable = true;
                 std::vector<ItemSelector> List;
-                std::vector<std::string> Selected;
+                std::vector<int> Selected;
                 float Color[4] = { 1.f, 0.f, 0.f, 1.f };
             }OtherEquipable;
 
             struct {
                 bool Enable = true;
                 std::vector<ItemSelector> List;
-                std::vector<std::string> Selected;
+                std::vector<int> Selected;
                 float Color[4] = { 1.f, 0.f, 0.f, 1.f };
             }Equipable;
         }Items;

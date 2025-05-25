@@ -18,7 +18,7 @@
 
 struct ItemSelector {
     std::string name;
-    std::vector<std::string> codes;
+    std::vector<int> codes;
 };
 
 //---- Define assertion handler. Defaults to calling assert().
