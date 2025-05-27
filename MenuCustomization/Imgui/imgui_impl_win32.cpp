@@ -90,9 +90,7 @@ struct ImGui_ImplWin32_Data
     INT64                       Time;
     INT64                       TicksPerSecond;
     ImGuiMouseCursor            LastMouseCursor;
-    HHOOK				MouseHook;
     POINT				CursorPos;
-    HHOOK				KeyboardHook;
 
 
 #ifndef IMGUI_IMPL_WIN32_DISABLE_GAMEPAD
@@ -120,9 +118,6 @@ void ResetGamePad() {
     bd->WantUpdateHasGamepad = true;
 }
 
-LRESULT hookLowLvlMouse(int nCode, WPARAM wParam, LPARAM lParam);
-LRESULT hookLowLvlKeyboard(int nCode, WPARAM wParam, LPARAM lParam);
-
 // Functions
 bool    ImGui_ImplWin32_Init(void* hwnd, void* TargetWnd)
 {
@@ -147,11 +142,6 @@ bool    ImGui_ImplWin32_Init(void* hwnd, void* TargetWnd)
     bd->TicksPerSecond = perf_frequency;
     bd->Time = perf_counter;
     bd->LastMouseCursor = ImGuiMouseCursor_COUNT;
-
-    if (!bd->KeyboardHook) {
-        bd->KeyboardHook = SetWindowsHookExA(WH_KEYBOARD_LL, hookLowLvlKeyboard, nullptr, 0);
-        IM_ASSERT(bd->KeyboardHook != NULL && "Keyboard hook failed!");
-    }
 
     // Set platform dependent data in viewport
     ImGui::GetMainViewport()->PlatformHandleRaw = (void*)hwnd;
@@ -367,20 +357,6 @@ void    ImGui_ImplWin32_NewFrame(bool ShowMenu)
     ::QueryPerformanceCounter((LARGE_INTEGER*)&current_time);
     io.DeltaTime = (float)(current_time - bd->Time) / bd->TicksPerSecond;
     bd->Time = current_time;
-
-    if (ShowMenu) {
-        if (!bd->MouseHook) {
-            bd->MouseHook = SetWindowsHookExA(WH_MOUSE_LL, hookLowLvlMouse, nullptr, 0);
-            IM_ASSERT(bd->MouseHook != NULL && "Mouse hook failed!");
-        }
-    }
-    else {
-        if (bd->MouseHook) {
-            if (UnhookWindowsHookEx(bd->MouseHook)) {
-                bd->MouseHook = 0;
-            }
-        }
-    }
     bd->bTargetForeground = ShowMenu;
 
     // Update OS mouse position
@@ -835,176 +811,4 @@ void ImGui_ImplWin32_EnableAlphaCompositing(void* hwnd)
         bb.dwFlags = DWM_BB_ENABLE;
         ::DwmEnableBlurBehindWindow((HWND)hwnd, &bb);
     }
-}
-
-//---------------------------------------------------------------------------------------------------------
-
-
-#define GET_WHEEL_DELTA(mouseData)      ((short)HIWORD(mouseData))
-LRESULT hookLowLvlMouse(int nCode, WPARAM wParam, LPARAM lParam)
-{
-    ImGui_ImplWin32_Data* bd = ImGui_ImplWin32_GetBackendData();
-
-    //  Dont handle input when out target is not foreground
-    if (!bd->bTargetForeground) {
-        return CallNextHookEx(bd->MouseHook, nCode, wParam, lParam);
-    }
-
-    if (nCode >= HC_ACTION)
-    {
-        ImGuiIO& Io = ImGui::GetIO();
-        PMSLLHOOKSTRUCT     pMouseData = reinterpret_cast<PMSLLHOOKSTRUCT>(lParam);
-
-        switch (wParam)
-        {
-
-        case WM_MOUSEMOVE:
-        case WM_NCMOUSEMOVE:
-        {
-            POINT mouse_pos = pMouseData->pt;
-            if (wParam == WM_NCMOUSEMOVE && ::ScreenToClient(bd->hWnd, &mouse_pos) == FALSE) // WM_NCMOUSEMOVE are provided in absolute coordinates.
-                break;
-            Io.MousePos.x = static_cast<float>(mouse_pos.x);
-            Io.MousePos.y = static_cast<float>(mouse_pos.y);
-            break;
-        }
-
-        case WM_LBUTTONDOWN:
-        case WM_LBUTTONDBLCLK:
-            Io.AddMouseButtonEvent(0, true);
-            break;
-
-        case WM_LBUTTONUP:
-            Io.AddMouseButtonEvent(0, false);
-            break;
-
-        case WM_RBUTTONDOWN:
-        case WM_RBUTTONDBLCLK:
-            Io.AddMouseButtonEvent(1, true);
-            break;
-
-        case WM_RBUTTONUP:
-            Io.AddMouseButtonEvent(1, false);
-            break;
-
-        case WM_MBUTTONDOWN:
-        case WM_MBUTTONDBLCLK:
-            Io.AddMouseButtonEvent(2, true);
-            break;
-
-        case WM_MBUTTONUP:
-            Io.AddMouseButtonEvent(2, false);
-            break;
-
-        case WM_XBUTTONDOWN:
-        case WM_XBUTTONDBLCLK:
-        {
-            //  Mouse Btn 4 or 5
-            int Button = (HIWORD(pMouseData->mouseData) == XBUTTON1) ? 3 : 4;
-
-            Io.AddMouseButtonEvent(Button, true);
-            break;
-        }
-
-        case WM_XBUTTONUP:
-        {
-            //  Mouse Btn 4 or 5
-            int Button = (HIWORD(pMouseData->mouseData) == XBUTTON1) ? 3 : 4;
-
-            Io.AddMouseButtonEvent(Button, false);
-            break;
-        }
-
-        case WM_MOUSEWHEEL:
-            Io.AddMouseWheelEvent(0.0f, (float)GET_WHEEL_DELTA(pMouseData->mouseData) / (float)WHEEL_DELTA);
-            return 0;
-        case WM_MOUSEHWHEEL:
-            Io.AddMouseWheelEvent(-(float)GET_WHEEL_DELTA(pMouseData->mouseData) / (float)WHEEL_DELTA, 0.0f);
-            return 0;
-
-        default:
-            break;
-        }
-    }
-
-    return CallNextHookEx(bd->MouseHook, nCode, wParam, lParam);
-}
-
-LRESULT hookLowLvlKeyboard(int nCode, WPARAM wParam, LPARAM lParam)
-{
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui_ImplWin32_Data* bd = ImGui_ImplWin32_GetBackendData();
-
-    //  Dont handle input when out target is not foreground
-    if (!bd->bTargetForeground)
-        return CallNextHookEx(bd->KeyboardHook, nCode, wParam, lParam);
-
-    if (nCode >= HC_ACTION)
-    {
-        ImGuiIO& Io = ImGui::GetIO();
-        PKBDLLHOOKSTRUCT    pKeyData = reinterpret_cast<PKBDLLHOOKSTRUCT>(lParam);
-
-        switch (wParam)
-        {
-
-        case WM_KEYDOWN:
-        case WM_KEYUP:
-        case WM_SYSKEYDOWN:
-        case WM_SYSKEYUP:
-        {
-            const bool is_key_down = (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN);
-            if (wParam < 256)
-            {
-                // Submit modifiers
-                ImGui_ImplWin32_UpdateKeyModifiers();
-
-                // Obtain virtual key code
-                // (keypad enter doesn't have its own... VK_RETURN with KF_EXTENDED flag means keypad enter, see IM_VK_KEYPAD_ENTER definition for details, it is mapped to ImGuiKey_KeyPadEnter.)
-                int vk = (int)wParam;
-                if ((wParam == VK_RETURN) && (HIWORD(lParam) & KF_EXTENDED))
-                    vk = IM_VK_KEYPAD_ENTER;
-                const ImGuiKey key = ImGui_ImplWin32_VirtualKeyToImGuiKey(vk);
-                const int scancode = (int)LOBYTE(HIWORD(lParam));
-
-                // Special behavior for VK_SNAPSHOT / ImGuiKey_PrintScreen as Windows doesn't emit the key down event.
-                if (key == ImGuiKey_PrintScreen && !is_key_down)
-                    ImGui_ImplWin32_AddKeyEvent(key, true, vk, scancode);
-
-                // Submit key event
-                if (key != ImGuiKey_None)
-                    ImGui_ImplWin32_AddKeyEvent(key, is_key_down, vk, scancode);
-
-                // Submit individual left/right modifier events
-                if (vk == VK_SHIFT)
-                {
-                    // Important: Shift keys tend to get stuck when pressed together, missing key-up events are corrected in ImGui_ImplWin32_ProcessKeyEventsWorkarounds()
-                    if (IsVkDown(VK_LSHIFT) == is_key_down) { ImGui_ImplWin32_AddKeyEvent(ImGuiKey_LeftShift, is_key_down, VK_LSHIFT, scancode); }
-                    if (IsVkDown(VK_RSHIFT) == is_key_down) { ImGui_ImplWin32_AddKeyEvent(ImGuiKey_RightShift, is_key_down, VK_RSHIFT, scancode); }
-                }
-                else if (vk == VK_CONTROL)
-                {
-                    if (IsVkDown(VK_LCONTROL) == is_key_down) { ImGui_ImplWin32_AddKeyEvent(ImGuiKey_LeftCtrl, is_key_down, VK_LCONTROL, scancode); }
-                    if (IsVkDown(VK_RCONTROL) == is_key_down) { ImGui_ImplWin32_AddKeyEvent(ImGuiKey_RightCtrl, is_key_down, VK_RCONTROL, scancode); }
-                }
-                else if (vk == VK_MENU)
-                {
-                    if (IsVkDown(VK_LMENU) == is_key_down) { ImGui_ImplWin32_AddKeyEvent(ImGuiKey_LeftAlt, is_key_down, VK_LMENU, scancode); }
-                    if (IsVkDown(VK_RMENU) == is_key_down) { ImGui_ImplWin32_AddKeyEvent(ImGuiKey_RightAlt, is_key_down, VK_RMENU, scancode); }
-                }
-            }
-            return 0;
-        }
-        case WM_CHAR:
-        {
-            wchar_t wch = 0;
-            ::MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, (char*)&wParam, 1, &wch, 1);
-            io.AddInputCharacter(wch);
-            return 0;
-        }
-        default:
-            break;
-        }
-    }
-
-    return CallNextHookEx(bd->KeyboardHook, nCode, wParam, lParam);
 }
