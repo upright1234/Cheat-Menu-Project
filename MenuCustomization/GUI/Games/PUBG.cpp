@@ -21,8 +21,8 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
     if (!ShowMenu)
         return;
     
+    const char* ColorTypes[] = {(("Static")), (("By Team")), (("By Visible"))};
     const char* hitboxes[] = { ("Head"), ("Chest"), ("Body"), ("Random") };
-    const char* predicts[] = { ("OFF"), ("Movement Only"), ("Bullet Drop Only"), ("Movement + Bullet Drop") };
     const char* boxes[] = { "Square", "Corner" };
     const char* LinesTypes[] = { ("Top"), ("Middle"), ("Bottom") };
     const char* HealthTypes[] = { ("Horizontal"), ("Vertical") };
@@ -31,7 +31,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
     const char* RadarTypes[] = { ("Square"), ("Circle") };
     const char* ItemShowTypes[] = { ("By Type"), ("By Name") };
     const char* ItemAttachShowTypes[] = { ("By Holding Weapon"), ("By Type"), ("By Weapon Name"), ("By Name") };
-    const char* WeaponTypes[] = { ("AR")
+    const char* WeaponTypes[] = { "Disabled",("AR")
                                 , ("DMR")
                                     , ("LMG")
                                 , ("Melee")

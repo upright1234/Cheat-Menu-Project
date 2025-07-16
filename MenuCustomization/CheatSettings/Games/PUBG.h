@@ -13,14 +13,42 @@
 struct SETTINGS {
     int iConfig = 0;
     int oldiConfig = 0;
-    int selectedWeapon = 0;
+    std::vector<std::string> InstalledFonts;
+    std::vector<std::string> AvailableFonts;
     struct AimStruct {
         bool Enable = true;
         bool VisibilityCheck = true;
         bool RecoilControl = true;
         bool IgnoreKnocked = false;
-        bool ByWeapon = false;
+        bool IgnoreDriving = false;
+        bool IgnoreBots = false;
+        int ByWeapon = 0; //0 = disabled, AR, DMR, LMG, Melee, Pistol, Shotgun, SMG, Sniper, Special, Throw
         bool Predict = false;
+        int MaxSpectators = 5;
+
+        bool SmoothInterpolation = true;
+        float InterpolationSpeed = 0.8f;
+        int InterpolationType = 0; // 0 = Linear, 1 = Bezier
+
+        bool TriggerBot = false;
+        int TriggerKey = VK_XBUTTON1;
+        float TriggerDelay = 0.05f;
+        float TriggerFOV = 2.0f;
+        bool TriggerBotDrawFOV = true;
+        float TriggerBotFOVColor[4] = { 1.0f, 0.5f, 0.0f, 0.6f };
+        float TriggerBotFOVThickness = 2.0f;
+
+        bool Humanization = false;
+        float ReactionTime = 0.1f;
+        float RandomOffset = 0.5f;
+
+        bool KillSwitch = false;
+        int KillSwitchKey = VK_F9;
+        bool AutoKillSwitch = false;
+        float KillSwitchDistance = 10.0f;
+
+        bool DeadZone = false;
+        float DeadZoneRadius = 5.0f;
 
         int HoldPrimaryKey = VK_LBUTTON;
         int HoldSecondaryKey = VK_RBUTTON;
@@ -30,34 +58,31 @@ struct SETTINGS {
         bool SaveTarget = true;
 
         bool AimLock = true;
-        float TargetSwitchDelay = 0.5f; //0-5, seconds
+        float TargetSwitchDelay = 0.5f; //seconds
 
         bool DrawFov = true;
         float FovColor[4] = { 0.f, 0.f, 0.f, 0.1f };
-        float FovThickness = 1.f; //1-5
+        float FovThickness = 1.f;
 
         bool DrawCrossHair = true;
         float CrossHairColor[4] = { 1.f, 1.f, 1.f, 1.f };
-        float CrossHairThickness = 1.f; //1-5
+        float CrossHairThickness = 1.f;
 
         bool DrawTarget = true;
         int TargetType = 1; //0 = circle, 1 = triangle
-        float TargetThickness = 1.f;//1-5
+        float TargetThickness = 1.f;
         float TargetCollor[4] = { 1.f, 1.f, 1.f, 1.f };
 
-        int HitBox = 0; //0 = Head, 1 = Chest, 2 = Body, 3 = Random
+        int HitBox = 0;
         //{
-            float MinFOV = 5.f; //0-180
-            float MaxFOV = 180.f; //0-180
+            float MinFOV = 5.f; //1.f
+            float MaxFOV = 180.f; //180.f
             bool CustomFov = false; //false = static, true = increase by coefficient
-            float DistanceCoefficient = 0.3f;
+            float DistanceCoefficient = 0;
             float TimeCoefficient = 0.3f;
         //}
-        float Smooth = 2.f; //1-10
-        bool HumanizedSmooth = true;
-
-        float HumanizedSmoothPercent = 2.f; //1-10
-        int MaxDistance = 600; //0-1000
+        float Smooth = 2.f;
+        int MaxDistance = 600;
     }Aim;
     AimStruct aimbot[10]; // AR, DMR, LMG, Melee, Pistol, Shotgun, SMG, Sniper, Special, Throw
     struct {
@@ -65,20 +90,25 @@ struct SETTINGS {
             bool Enable = true;
             int ToggleKey = VK_F6;
 
-            int MaxDistance = 800; //0-1000
-            float MinFontSize = 10.f; //10-30
-            float MaxFontSize = 16.f; //10-30
+            int MaxDistance = 800;
+            float MinFontSize = 10.f;
+            float MaxFontSize = 16.f;
+
+            bool DistanceTransparency = true;
+
+            float MinTransparency = 0.3f;
+            float MaxTransparency = 1.0f;
 
             struct {
                 bool Enable = true;
-                float Size = 5.f; //1-10
-                float Thickness = 4.f;//1-5
+                float Size = 5.f;
+                float Thickness = 4.f;
                 bool Filled = false;
                 int ColorType = 0; //0 = static, 1 = by team, 2 = by visible
                 float StaticColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 float VisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 float NonVisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
-                int TeamColorAlpha = 255; //0-255
+                int TeamColorAlpha = 255;
             }HeadCircle;
 
             struct {
@@ -89,7 +119,8 @@ struct SETTINGS {
                 float StaticColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 float VisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 float NonVisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
-                int TeamColorAlpha = 255; //0-255
+                int TeamColorAlpha = 255;
+                int FontStyle = 0;
             }Distance;
 
             struct {
@@ -99,7 +130,8 @@ struct SETTINGS {
                 float StaticColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 float VisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 float NonVisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
-                int TeamColorAlpha = 255; //0-255
+                int TeamColorAlpha = 255;
+                int FontStyle = 0;
             }NickName;
 
             struct {
@@ -109,51 +141,107 @@ struct SETTINGS {
                 float StaticColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 float VisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 float NonVisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
-                int TeamColorAlpha = 255; //0-255
+                int TeamColorAlpha = 255;
+                int FontStyle = 0;
             }Weapon;
 
             struct {
                 bool Enable = true;
                 bool Filled = true;
                 int Type = 1; //0 = square, 1 = corner
-                int rounding = 20;//1-20
-                float Thickness = 1.f;//1-5
-                float Width = 0.35f;//0.1-1
+                int rounding = 20;
+                float Thickness = 1.f;
+                float Width = 0.35f;
                 int ColorType = 0; //0 = static, 1 = by team, 2 = by visible
                 float FillColor[4] = { 0.f, 0.f, 0.f, .2f };
                 float StaticColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 float VisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 float NonVisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
-                int TeamColorAlpha = 255; //0-255
+                int TeamColorAlpha = 255;
             }Box;
 
             struct {
                 bool Enable = true;
                 int Position = 0; //0 = top, 1 = bottom
-                float Thickness = 1.f;//1-5
+                float Thickness = 1.f;
                 int ColorType = 0; //0 = static, 1 = by team, 2 = by visible
                 float StaticColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 float VisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 float NonVisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
-                int TeamColorAlpha = 255; //0-255
+                int TeamColorAlpha = 255;
             }Lines;
 
             struct {
                 bool Enable = true;
-                float Thickness = 1.f;//1-5
+                float Thickness = 1.f;
                 int ColorType = 0; //0 = static, 1 = by team, 2 = by visible
                 float StaticColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 float VisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 float NonVisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
-                int TeamColorAlpha = 255; //0-255
+                int TeamColorAlpha = 255;
             }Skeleton;
 
             struct {
                 bool Enable = true;
+                bool HealthGradient = true;
                 int position = 1; //0 = top, 1 = bottom, 2 = left, 3 = right
-                float Thickness = 4.f;//1-5
-                int ColorAlpha = 255; //0-255
+                float Thickness = 4.f;
+                int ColorAlpha = 255;
             }Health;
+
+            struct {
+                bool Enable = true;
+                int ColorType = 0; //0 = static, 1 = by team, 2 = by visible
+                int position = 1; //0 = top, 1 = bottom, 2 = left, 3 = right
+                float StaticColor[4] = { 1.f, 0.f, 0.f, 1.f };
+                float VisibleColor[4] = { 1.f, 0.2f, 0.2f, 1.f };
+                float NonVisibleColor[4] = { 0.6f, 0.6f, 0.6f, 0.3f };
+                int TeamColorAlpha = 255;
+                int FontStyle = 0;
+            }Status;
+
+            struct {
+                bool Enable = true;
+                int ColorType = 0; //0 = static, 1 = by team, 2 = by visible
+                int position = 1; //0 = top, 1 = bottom, 2 = left, 3 = right
+                float StaticColor[4] = { 0.f, 1.f, 1.f, 1.f };
+                float VisibleColor[4] = { 1.f, 0.2f, 0.2f, 1.f };
+                float NonVisibleColor[4] = { 0.6f, 0.6f, 0.6f, 0.3f };
+                int TeamColorAlpha = 255;
+                int FontStyle = 0;
+            }Velocity;
+
+            struct {
+                bool Enable = true;
+                float PredictionTime = 2.0f;
+                float Length = 50.0f;
+                float Thickness = 2.0f;
+                bool ShowEndPoint = true;
+                float EndPointSize = 3.0f;
+
+                int ColorType = 0; //0 = static, 1 = by team, 2 = by visible
+                float StaticColor[4] = { 1.f, 1.f, 0.f, 0.8f };
+                float VisibleColor[4] = { 1.f, 0.2f, 0.2f, 1.f };
+                float NonVisibleColor[4] = { 0.6f, 0.6f, 0.6f, 0.3f };
+                int TeamColorAlpha = 204;
+
+                float MinVelocity = 5.0f;
+            }PredictionLines;
+
+            struct {
+                bool Enable = true;
+                float ProximityRadius = 50.0f;
+
+                bool PulsatingBorder = true;
+                bool ProximityText = true;
+
+                float BorderThickness = 4.0f;
+                float TextSize = 20.0f;
+
+                float AlertColor[4] = { 1.f, 0.1f, 0.1f, 0.9f };
+                float TextColor[4] = { 1.f, 1.f, 0.f, 1.f };
+
+            }ProximityAlerts;
         }Players;
 
         struct {
@@ -161,48 +249,49 @@ struct SETTINGS {
             int PositionX = 10;
             int PositionY = 30;
             int ToggleKey = VK_F7;
-            int MaxDistance = 150; //0-1000
+            int MaxDistance = 150;
 
-            int Zoom = 10; //1-100
-            int Size = 200; //50-500
+            int Zoom = 10;
+            int Size = 200;
 
-            float MinSize = 1.f; //1-6
-            float MaxSize = 4.f; //1-6
-            float MinOpacity = 0.2f; //0-1
-            float MaxOpacity = 1.0f; //0-1
+            float MinSize = 1.f;
+            float MaxSize = 4.f;
+            float MinOpacity = 0.2f;
+            float MaxOpacity = 1.0f;
             int ColorType = 0; //0 = static, 1 = by team, 2 = by visible
             float StaticColor[4] = { 1.f, 1.f, 1.f, 1.f };
             float VisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
             float NonVisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
-            int TeamColorAlpha = 255; //0-255
+            int TeamColorAlpha = 255;
         }Radar;
 
         struct {
             bool Enable = true;
             int ToggleKey = VK_F7;
-            int MaxDistance = 150; //0-1000
+            int MaxDistance = 150;
 
-            int Type = 0; //0 = Circle, 1 = Triange
-            int Fov = 15; //0-180
-            float Thickness = 2.f;//1-5
-            float MinOpacity = 0.2f; //0-1
-            float MaxOpacity = 1.0f; //0-1
-            float MinSize = 1.f; //1-6
-            float MaxSize = 6.f; //1-6
+            int Type = 0;
+            int Fov = 15;
+            float Thickness = 2.f;
+            float MinOpacity = 0.2f;
+            float MaxOpacity = 1.0f;
+            float MinSize = 10.f;
+            float MaxSize = 30.f;
             int ColorType = 0; //0 = static, 1 = by team, 2 = by visible
             float StaticColor[4] = { 1.f, 1.f, 1.f, 1.f };
             float VisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
             float NonVisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
-            int TeamColorAlpha = 255; //0-255
+            int TeamColorAlpha = 255;
         }OutScreen;
 
         struct {
             bool Enable = false;
             int ToggleKey = VK_F8;
 
-            int MaxDistance = 150; //0-1000
-            float MinFontSize = 10.f; //10-30
-            float MaxFontSize = 16.f; //10-30
+            int MaxDistance = 150;
+            float MinFontSize = 10.f;
+            float MaxFontSize = 16.f;
+            int FontStyle = 0;
 
             struct {
                 bool Enable = true;
@@ -280,9 +369,8 @@ struct SETTINGS {
     }Visuals;
 
     struct {
-        int Language = 0; //ignore
-        bool FeaturesDefinition = true; //ignore
-        int FontStyle = 0; //0 = Verdana, 1 = Fortnite
+        int Language = 0;
+        bool FeaturesDefinition = true;
         int GameFPS = 60; //literally your game FPS count
         int RenderFPS = 144; //The cheat render FPS limit
         bool SpectatorCount = true;
