@@ -17,6 +17,8 @@ int selectedItem = 0;
 bool firstTime = true;
 void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
 
+    //example force disable option
+    Settings->Aim.SmoothInterpolation = false;
 
     if (!ShowMenu)
         return;
