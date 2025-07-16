@@ -28,7 +28,6 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
     const char* HealthTypes[] = { ("Horizontal"), ("Vertical") };
     const char* AimTargetTypes[] = { ("Circle"), ("Triangle") };
     const char* FontTypes[] = { ("Fortnite"), ("Verdana") };
-    const char* RadarTypes[] = { ("Square"), ("Circle") };
     const char* ItemShowTypes[] = { ("By Type"), ("By Name") };
     const char* ItemAttachShowTypes[] = { ("By Holding Weapon"), ("By Type"), ("By Weapon Name"), ("By Name") };
     const char* WeaponTypes[] = { "Disabled",("AR")
@@ -51,6 +50,30 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
                                     , ("Sniper")
                                 , ("Special")
                                 , ("Throw") };
+
+    //Install font example
+    static int selectedSystemFont = 0;
+    ImGui::Combo((("Available System Fonts")), &selectedSystemFont, Settings->AvailableFonts);
+    if (ImGui::Button((("Load Font")), { 100, 25 })) {
+        if (selectedSystemFont >= 0 && selectedSystemFont < Settings->AvailableFonts.size()) {
+            std::string fontName = Settings->AvailableFonts[selectedSystemFont];
+            if (std::find(Settings->InstalledFonts.begin(), Settings->InstalledFonts.end(), fontName) == Settings->InstalledFonts.end()) {
+                Settings->InstalledFonts.push_back(fontName);
+            }
+        }
+    }
+
+    //Apply font to all render example
+    static int selectedFontForAll = 0;
+    ImGui::Combo((("Select Font for All")), &selectedFontForAll, Settings->InstalledFonts);
+    if (ImGui::Button((("Apply to All")), { 150, 25 })) {
+        Settings->Visuals.Players.NickName.FontStyle = selectedFontForAll;
+        Settings->Visuals.Players.Weapon.FontStyle = selectedFontForAll;
+        Settings->Visuals.Players.Distance.FontStyle = selectedFontForAll;
+        Settings->Visuals.Players.Status.FontStyle = selectedFontForAll;
+        Settings->Visuals.Players.Velocity.FontStyle = selectedFontForAll;
+        Settings->Visuals.Items.FontStyle = selectedFontForAll;
+    }
 
     CustomStyleColor();
     if (firstTime) {
