@@ -60,6 +60,9 @@
     <ClCompile Include="GUI\etc_element.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
+    <ClCompile Include="GUI\Games\BO6.cpp">
+      <Filter>GUI\Games</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Imgui\imconfig.h">
@@ -112,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="GUI\main.h">
       <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="CheatSettings\Games\BO6.h">
+      <Filter>Arquivos de Cabeçalho\Games</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
