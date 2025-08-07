@@ -27,6 +27,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
     const char* LinesTypes[] = { ("Top"), ("Middle"), ("Bottom") };
     const char* HealthTypes[] = { ("Horizontal"), ("Vertical") };
     const char* AimTargetTypes[] = { ("Circle"), ("Triangle") };
+    const char* rarityOptions[] = { "Grey", "Green", "Blue", "Purple", "Gold" };
 
     //Install font example
     static int selectedSystemFont = 0;
