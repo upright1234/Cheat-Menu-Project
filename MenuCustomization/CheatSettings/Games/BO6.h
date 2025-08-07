@@ -266,60 +266,35 @@ struct SETTINGS {
             int TeamColorAlpha = 255;//0-255
         }OutScreen;
 
-        struct {  //Currently disabled
+        struct {
             bool Enable = false;
             int ToggleKey = VK_F8;
 
-            int MaxDistance = 150;
-            float MinFontSize = 10.f;
-            float MaxFontSize = 16.f;
+            int MaxDistance = 150;//1-800
+            float MinFontSize = 10.f;//10-30
+            float MaxFontSize = 16.f;//10-30
 
             int FontStyle = 0;
 
-            struct {
+            struct ItemTypeConfig {
                 bool Enable = true;
-                float Color[4] = { 1.f, 0.f, 0.f, 1.f };
-            }Weapon;
+                int MinRarity = 0; // 0=grey, 1=green, 2=blue, 3=purple, 4=gold
+            };
 
-            struct {
-                bool Enable = true;
-                float Color[4] = { 1.f, 0.f, 0.f, 1.f };
-            }Ammo;
-
-            struct {
-                bool Enable = true;
-                float Color[4] = { 1.f, 0.f, 0.f, 1.f };
-            }Cash;
-
-            struct {
-                bool Enable = true;
-                float Color[4] = { 1.f, 0.f, 0.f, 1.f };
-            }Perks;
-
-            struct {
-                bool Enable = true;
-                float Color[4] = { 1.f, 0.f, 0.f, 1.f };
-            }Crates;
-
-            struct {
-                bool Enable = true;
-                float Color[4] = { 1.f, 0.f, 0.f, 1.f };
-            }Throwables;
-
-            struct {
-                bool Enable = true;
-                float Color[4] = { 1.f, 0.f, 0.f, 1.f };
-            }Medicine;
-
-            struct {
-                bool Enable = true;
-                float Color[4] = { 1.f, 0.f, 0.f, 1.f };
-            }OtherEquipable;
-
-            struct {
-                bool Enable = true;
-                float Color[4] = { 1.f, 0.f, 0.f, 1.f };
-            }Equipable;
+            ItemTypeConfig Weapon = { true, 0 };
+            ItemTypeConfig Ammo = { true, 0 };
+            ItemTypeConfig Cash = { true, 0 };
+            ItemTypeConfig Perks = { true, 0 };
+            ItemTypeConfig Crates = { true, 0 };
+            ItemTypeConfig Tokens = { true, 0 };
+            ItemTypeConfig FieldUpgrade = { true, 0 };
+            ItemTypeConfig Plate = { true, 0 };
+            ItemTypeConfig Tactical = { true, 0 };
+            ItemTypeConfig GasMask = { true, 0 };
+            ItemTypeConfig ReviveKit = { true, 0 };
+            ItemTypeConfig Contracts = { true, 0 };
+            ItemTypeConfig Lethal = { true, 0 };
+            ItemTypeConfig Keys = { true, 0 };
         }Items;
     }Visuals;
 
@@ -334,9 +309,7 @@ struct SETTINGS {
 
         bool DisableFlashEffects = false;
         bool ThirdPerson = false;
-        bool RemoveWeaponMovement = false; //Currently disabled
-        bool FovChanger = false; //Currently disabled
-        int FovAmount = 10; //Currently disabled
+        bool RemoveWeaponMovement = false;
     }Configs;
 };
 
