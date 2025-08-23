@@ -6,7 +6,7 @@
 #include "../main.h"
 #include "../etc_element.h"
 
-#if IsBO6
+#if IsMW3 || IsBO6
 float animation_ = 0.0f;
 
 #define ALPHA (ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_NoDragDrop | ImGuiColorEditFlags_PickerHueBar)
@@ -15,6 +15,7 @@ float animation_ = 0.0f;
 char cfgname[30] = "NewSetting";
 int selectedItem = 0;
 bool firstTime = true;
+
 void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
 
 
@@ -28,6 +29,10 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
     const char* HealthTypes[] = { ("Horizontal"), ("Vertical") };
     const char* AimTargetTypes[] = { ("Circle"), ("Triangle") };
     const char* rarityOptions[] = { "Grey", "Green", "Blue", "Purple", "Gold" };
+    const char* keysOptions[] = {"None", "D-Pad Up", "D-Pad Down", "D-Pad Left", "D-Pad Right",
+    "Start", "Back", "L3", "R3", "Gamepad A", "Gamepad B", "Gamepad X", "Gamepad Y",
+        "Left Bumper", "Right Bumper", "Left Trigger", "Right Trigger" };
+
 
     //Install font example
     static int selectedSystemFont = 0;

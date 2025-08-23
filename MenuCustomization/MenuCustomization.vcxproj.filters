@@ -60,7 +60,7 @@
     <ClCompile Include="GUI\etc_element.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="GUI\Games\BO6.cpp">
+    <ClCompile Include="GUI\Games\MW3BO6.cpp">
       <Filter>GUI\Games</Filter>
     </ClCompile>
   </ItemGroup>
@@ -117,6 +117,9 @@
       <Filter>GUI</Filter>
     </ClInclude>
     <ClInclude Include="CheatSettings\Games\BO6.h">
+      <Filter>Arquivos de Cabeçalho\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="CheatSettings\Games\MW3.h">
       <Filter>Arquivos de Cabeçalho\Games</Filter>
     </ClInclude>
   </ItemGroup>

@@ -13,7 +13,7 @@
 struct SETTINGS {
     int iConfig = 0;
     int oldiConfig = 0;
-    std::vector<std::string> InstalledFonts;
+    std::vector<std::string> InstalledFonts = { "FortFont", "VerdanaFont" };
     std::vector<std::string> AvailableFonts;
     struct AimStruct {
         bool Enable = true;
@@ -24,11 +24,11 @@ struct SETTINGS {
         bool SpreadControl = false;
         bool RecoilControl = false;
         float RecoilSlider = 1.f;//0.1-1
-        int MaxSpectators = 5;//0-20
         bool Predict = false;
 
         bool TriggerBot = false;
         int TriggerKey = VK_XBUTTON1;
+        int ControllerTriggerKey = 1; //keysOptions
         float TriggerDelay = 0.05f; //0.1-1
         float TriggerFOV = 2.0f; //1-10
         bool TriggerBotDrawFOV = true;
@@ -43,6 +43,9 @@ struct SETTINGS {
         bool DeadZone = false;
         float DeadZoneRadius = 5.0f; //1-20
 
+        int ControllerPrimaryKey = 1; //keysOptions
+        int ControllerSecondaryKey = 2; //keysOptions
+        int ControllerSwitchToHeadKey = 3; //keysOptions
         int HoldPrimaryKey = VK_LBUTTON;
         int HoldSecondaryKey = VK_RBUTTON;
         int SwitchToHeadKey = VK_SHIFT;
@@ -301,15 +304,13 @@ struct SETTINGS {
     struct {
         int Language = 0;
         bool FeaturesDefinition = true;
-        int GameFPS = 60; //literally your game FPS count
-        int RenderFPS = 144; //The cheat render FPS limit
-        bool SpectatorCount = true;
+        int GameFPS = 60;
+        int RenderFPS = 144;
         int MenuKey = VK_INSERT;
         bool VSync = false;
 
         bool DisableFlashEffects = false;
-        bool ThirdPerson = false;
-        bool RemoveWeaponMovement = false;
+        bool TeamCheck = true;
     }Configs;
 };
 
