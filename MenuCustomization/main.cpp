@@ -151,7 +151,7 @@ bool InitializeMenu(HWND Window, ID3D11Device *g_pd3dDevice, ID3D11DeviceContext
 		return false;
 }
 
-void RenderMenu(bool *ShowMenu, int GameX, int GameY, int GameWidth, int GameHeight, SETTINGS *Settings, CConfig *g_pConfig)
+void RenderMenu(bool *ShowMenu, int GameX, int GameY, int GameWidth, int GameHeight, SETTINGS *Settings, CConfig *g_pConfig, float mouse_wheel)
 {
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame(ShowMenu);
@@ -159,6 +159,11 @@ void RenderMenu(bool *ShowMenu, int GameX, int GameY, int GameWidth, int GameHei
 
 	LoadKeys();
 	LoadController();
+	if (mouse_wheel != 0.f) {
+		ImGuiIO& io = ImGui::GetIO();
+		(void)io;
+		io.AddMouseWheelEvent(0, mouse_wheel);
+	}
 
 	ImGui::SetNextWindowBgAlpha(0.f);
 	ImGui::SetNextWindowPos({(float)GameX, (float)GameY}, ImGuiCond_Always);
