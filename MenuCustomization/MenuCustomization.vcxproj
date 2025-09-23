@@ -163,6 +163,7 @@
   <ItemGroup>
     <ClCompile Include="GUI\custom.cpp" />
     <ClCompile Include="GUI\etc_element.cpp" />
+    <ClCompile Include="GUI\Games\Fortnite.cpp" />
     <ClCompile Include="GUI\Games\MW3BO6.cpp" />
     <ClCompile Include="GUI\Games\PUBG.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
@@ -177,6 +178,7 @@
   <ItemGroup>
     <ClInclude Include="CheatSettings\Config.h" />
     <ClInclude Include="CheatSettings\Games\BO6.h" />
+    <ClInclude Include="CheatSettings\Games\Fortnite.h" />
     <ClInclude Include="CheatSettings\Games\MW3.h" />
     <ClInclude Include="CheatSettings\Games\PUBG.h" />
     <ClInclude Include="GUI\custom.hpp" />

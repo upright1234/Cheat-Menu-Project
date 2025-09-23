@@ -4,8 +4,8 @@
 #include <vector>
 
 #define IsApex 0
-#define IsFortnite 0
-#define IsBO6 1
+#define IsFortnite 1
+#define IsBO6 0
 #define IsMW3 0
 #define IsRust 0
 #define IsValorant 0
