@@ -66,6 +66,9 @@
     <ClCompile Include="GUI\Games\Fortnite.cpp">
       <Filter>GUI\Games</Filter>
     </ClCompile>
+    <ClCompile Include="GUI\Games\Apex.cpp">
+      <Filter>GUI\Games</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Imgui\imconfig.h">
@@ -126,6 +129,9 @@
       <Filter>Arquivos de Cabeçalho\Games</Filter>
     </ClInclude>
     <ClInclude Include="CheatSettings\Games\Fortnite.h">
+      <Filter>Arquivos de Cabeçalho\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="CheatSettings\Games\Apex.h">
       <Filter>Arquivos de Cabeçalho\Games</Filter>
     </ClInclude>
   </ItemGroup>
