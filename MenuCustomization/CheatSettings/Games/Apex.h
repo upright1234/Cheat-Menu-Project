@@ -10,13 +10,13 @@
 
 #if IsApex
 
-struct SETTINGS {
+struct SETTINGSResellers {
     int iConfig = 0;
     int oldiConfig = 0;
     std::vector<std::string> InstalledFonts = { "FortFont", "VerdanaFont" };
     std::vector<std::string> AvailableFonts;
     struct AimStruct {
-        int ByWeapon = 0; //0 = disabled, AR, DMR, LMG, Melee, Pistol, Shotgun, SMG, Sniper, Special, Throw
+        int ByWeapon = 0; //0 = disabled, AR, DMR, LMG, Pistol, Shotgun, SMG, Sniper
         bool Enable = true;
         bool MemoryAim = false;
         bool VisibilityCheck = true;
@@ -71,7 +71,7 @@ struct SETTINGS {
         float Smooth = 2.f;//1-10
         int MaxDistance = 600;//1-1000
     }Aim;
-    AimStruct aimbot[10]; // AR, DMR, LMG, Melee, Pistol, Shotgun, SMG, Sniper, Special, Throw
+    AimStruct aimbot[7]; // AR, DMR, LMG, Pistol, Shotgun, SMG, Sniper
     struct {
         struct {
             bool Enable = false;
@@ -399,5 +399,6 @@ struct SETTINGS {
         bool VSync = false;
     }Configs;
 };
+
 
 #endif
