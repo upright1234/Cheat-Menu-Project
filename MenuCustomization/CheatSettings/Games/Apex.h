@@ -10,7 +10,7 @@
 
 #if IsApex
 
-struct SETTINGSResellers {
+struct SETTINGS {
     int iConfig = 0;
     int oldiConfig = 0;
     std::vector<std::string> InstalledFonts = { "FortFont", "VerdanaFont" };
