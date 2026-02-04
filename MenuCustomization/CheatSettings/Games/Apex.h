@@ -70,7 +70,6 @@ struct SETTINGS {
         //}
         float Smooth = 2.f;//1-10
         int MaxDistance = 600;//1-1000
-
         struct SkyNadeStruct {
             bool Enable = false;
             int Key = VK_F10;
