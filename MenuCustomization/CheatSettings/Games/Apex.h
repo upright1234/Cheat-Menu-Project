@@ -70,6 +70,14 @@ struct SETTINGS {
         //}
         float Smooth = 2.f;//1-10
         int MaxDistance = 600;//1-1000
+
+        struct SkyNadeStruct {
+            bool Enable = false;
+            int Key = VK_F10;
+            bool ShowIndicator = true;
+            float IndicatorColor[4] = { 0.0f, 1.0f, 0.5f, 0.8f };
+            float FontSize = 10.f;
+        }SkyNade;
     }Aim;
     AimStruct aimbot[7]; // AR, DMR, LMG, Pistol, Shotgun, SMG, Sniper
     struct {
