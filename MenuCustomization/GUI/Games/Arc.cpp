@@ -67,12 +67,6 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
         Settings->Visuals.Items.FontStyle = selectedFontForAll;
     }
 
-    //Config By Weapon example
-    ImGui::BeginGroup();
-    {
-        ImGui::Combo("Weapon", &Settings->Aim.ByWeapon, ByWeaponTypes, IM_ARRAYSIZE(ByWeaponTypes), IM_ARRAYSIZE(ByWeaponTypes));   
-    }ImGui::EndGroup();
-
     //Config selector example
     ImGui::BeginGroup();
     {
