@@ -7,8 +7,9 @@
 #define IsArc 
 #define IsFortnite 0
 #define IsBO6 0
+#define IsMarvel 1
 #define IsMW3 0
-#define IsRust 1
+#define IsRust 0
 #define IsValorant 0
 #define IsPUBG 0
 

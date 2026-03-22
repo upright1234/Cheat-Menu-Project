@@ -166,6 +166,7 @@
     <ClCompile Include="GUI\Games\Apex.cpp" />
     <ClCompile Include="GUI\Games\Arc.cpp" />
     <ClCompile Include="GUI\Games\Fortnite.cpp" />
+    <ClCompile Include="GUI\Games\MarvelRivals.cpp" />
     <ClCompile Include="GUI\Games\MW3BO6.cpp" />
     <ClCompile Include="GUI\Games\PUBG.cpp" />
     <ClCompile Include="GUI\Games\Rust.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="CheatSettings\Games\Arc.h" />
     <ClInclude Include="CheatSettings\Games\BO6.h" />
     <ClInclude Include="CheatSettings\Games\Fortnite.h" />
+    <ClInclude Include="CheatSettings\Games\MarvelRivals.h" />
     <ClInclude Include="CheatSettings\Games\MW3.h" />
     <ClInclude Include="CheatSettings\Games\PUBG.h" />
     <ClInclude Include="CheatSettings\Games\Rust.h" />

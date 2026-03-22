@@ -1,6 +1,7 @@
 #pragma once
 #include "../CheatSettings/Games/PUBG.h"
 #include "../CheatSettings/Games/BO6.h"
+#include "../CheatSettings/Games/MarvelRivals.h"
 #include "../CheatSettings/Games/MW3.h"
 #include "../CheatSettings/Games/Fortnite.h"
 #include "../CheatSettings/Games/Apex.h"

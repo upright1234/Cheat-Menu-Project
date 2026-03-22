@@ -75,6 +75,9 @@
     <ClCompile Include="GUI\Games\Rust.cpp">
       <Filter>GUI\Games</Filter>
     </ClCompile>
+    <ClCompile Include="GUI\Games\MarvelRivals.cpp">
+      <Filter>GUI\Games</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Imgui\imconfig.h">
@@ -144,6 +147,9 @@
       <Filter>Arquivos de Cabeçalho\Games</Filter>
     </ClInclude>
     <ClInclude Include="CheatSettings\Games\Rust.h">
+      <Filter>Arquivos de Cabeçalho\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="CheatSettings\Games\MarvelRivals.h">
       <Filter>Arquivos de Cabeçalho\Games</Filter>
     </ClInclude>
   </ItemGroup>
