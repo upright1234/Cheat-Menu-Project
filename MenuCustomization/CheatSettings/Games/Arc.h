@@ -9,7 +9,6 @@
 #include "imconfig.h"
 
 #if IsArc
-
 struct SETTINGS {
     int iConfig = 0;
     int oldiConfig = 0;
@@ -18,8 +17,6 @@ struct SETTINGS {
     struct AimStruct {
         bool Enable = true;
         bool VisibilityCheck = true;
-        bool IgnoreKnocked = true;
-        bool IgnoreBots = false;
 
         bool DeadZone = false;
         float DeadZoneRadius = 5.0f; //1-20
@@ -29,6 +26,7 @@ struct SETTINGS {
         int SwitchToHeadKey = VK_SHIFT;
         int ToggleKey = VK_F6;
 
+        bool MemoryAimbot = true;
         bool SaveTarget = true;
 
         bool AimLock = false;
@@ -160,17 +158,6 @@ struct SETTINGS {
             }Shield;
 
             struct {
-                bool Enable = true;
-                int ColorType = 0; //0 = static, 1 = by team, 2 = by visible
-                int position = 1; //0 = top, 1 = bottom, 2 = left, 3 = right
-                float StaticColor[4] = { 1.f, 0.f, 0.f, 1.f };
-                float VisibleColor[4] = { 1.f, 0.2f, 0.2f, 1.f };
-                float NonVisibleColor[4] = { 0.6f, 0.6f, 0.6f, 0.3f };
-                int TeamColorAlpha = 255; //0-255
-                int FontStyle = 0; //0-(InstalledFonts.size()-1)
-            }Status;
-
-            struct {
                 bool Enable = false;
                 float Color[4] = { 1.f, 1.f, 1.f, 1.f };
                 int FontStyle = 0; //0-(InstalledFonts.size()-1)
@@ -239,36 +226,39 @@ struct SETTINGS {
             bool Enable = false;
             int ToggleKey = VK_F8;
 
-            int MaxDistance = 150; //0-800
-            float MinFontSize = 10.f; //10-30
-            float MaxFontSize = 16.f; //10-30
+            int MaxDistance = 150;
+            float MinFontSize = 10.f;
+            float MaxFontSize = 16.f;
 
             bool DistanceTransparency = true;
-            float MinTransparency = 0.3f; //0.0-1.0
-            float MaxTransparency = 1.0f; //0.0-1.0
+            float MinTransparency = 0.3f;
+            float MaxTransparency = 1.0f;
 
             int FontStyle = 0;
 
             bool Drones = false;
             bool Containers = false;
             bool Pickups = false;
+            bool Extraction = true;
             float DroneColor[4] = { 1.0f, 0.75f, 0.20f, 1.0f };
             float ContainerColor[4] = { 0.40f, 0.85f, 1.00f, 1.0f };
             float PickupColor[4] = { 0.60f, 1.00f, 0.60f, 1.0f };
+            float ExtractionColor[4] = { 0.60f, 1.00f, 0.60f, 1.0f };
 
-            bool DroneTypes[17] = {
-                true, true, true, true, true, true, true, true, true,
-                true, true, true, true, true, true, true, true
+            bool DroneTypes[25] = {
+                 false, false, false, false, false, false, false, false, false,
+                 false, false, false, false, false, false, false, false,
+                 false, false, false, false, false, false, false, false
             };
-            bool ContainerTypes[14] = {
-                false, false, false, false, false, false, false,
-                false, false, false, false, false, false, false
+            bool ContainerTypes[25] = {
+                false, false, false, false, false, false, false, false, false,
+                false, false, false, false, false, false, false, false,
+                false, false, false, false, false, false, false, false
             };
-            bool PickupRarity[5] = { false, false, true, true, true };
         }Items;
     }Visuals;
     struct {
-        int Language = 0;
+        int Language = 0; //0 = English, 1 = Portuguese
         bool FeaturesDefinition = true;
         int GameFPS = 60; //30-240
         int RenderFPS = 144; //30-360

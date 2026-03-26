@@ -4,10 +4,11 @@
 #include <vector>
 
 #define IsApex 0
-#define IsArc 
+#define IsArc 0
 #define IsFortnite 0
 #define IsBO6 0
-#define IsMarvel 1
+#define IsMarvel 0
+#define IsMW19 1
 #define IsMW3 0
 #define IsRust 0
 #define IsValorant 0

@@ -32,15 +32,13 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
     std::vector<std::string> DroneTypeLabels = {
         "Wasp", "Hornet", "Rocketeer", "Pop", "Fireball", "Tick",
         "Turret", "Sentinel", "Snitch", "Bastion", "Spotter", "Leaper",
-        "Surveyor", "Queen", "Bombardier", "Shredder", "Matriarch"
+        "Surveyor", "Queen", "Bombardier", "Shredder", "Matriarch", "Flamethrower",
+        "Rollbot", "Smoke Trail"
     };
     std::vector<std::string> ContainerTypeLabels = {
         "Lockers", "Crates", "Desks/Closets", "Trash", "Nature", "Vehicles",
         "Raider Loot", "Shelf Drawers", "Cabinets", "Consoles", "Servers",
-        "Wall Panels", "Special Crates", "Workbench/Android"
-    };
-    std::vector<std::string> PickupRarityLabels = {
-        "Common", "Uncommon", "Rare", "Epic", "Legendary"
+        "Wall Panels", "Special Crates", "Workbench/Android", "Supply Call Station"
     };
 
     //Install font example
@@ -59,11 +57,8 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
     static int selectedFontForAll = 0;
     ImGui::Combo((("Select Font for All")), &selectedFontForAll, Settings->InstalledFonts);
     if (ImGui::Button((("Apply to All")), { 150, 25 })) {
-        Settings->Visuals.Players.NickName.FontStyle = selectedFontForAll;
         Settings->Visuals.Players.Weapon.FontStyle = selectedFontForAll;
         Settings->Visuals.Players.Distance.FontStyle = selectedFontForAll;
-        Settings->Visuals.Players.Status.FontStyle = selectedFontForAll;
-        Settings->Visuals.Players.Velocity.FontStyle = selectedFontForAll;
         Settings->Visuals.Items.FontStyle = selectedFontForAll;
     }
 

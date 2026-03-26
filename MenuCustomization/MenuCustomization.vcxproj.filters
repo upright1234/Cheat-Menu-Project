@@ -78,6 +78,9 @@
     <ClCompile Include="GUI\Games\MarvelRivals.cpp">
       <Filter>GUI\Games</Filter>
     </ClCompile>
+    <ClCompile Include="GUI\Games\MW19.cpp">
+      <Filter>GUI\Games</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Imgui\imconfig.h">
@@ -150,6 +153,9 @@
       <Filter>Arquivos de Cabeçalho\Games</Filter>
     </ClInclude>
     <ClInclude Include="CheatSettings\Games\MarvelRivals.h">
+      <Filter>Arquivos de Cabeçalho\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="CheatSettings\Games\MW19.h">
       <Filter>Arquivos de Cabeçalho\Games</Filter>
     </ClInclude>
   </ItemGroup>
