@@ -376,6 +376,12 @@ struct SETTINGS {
         bool SpectatorCount = true;
         int MenuKey = VK_INSERT;
     }Configs;
+    struct {
+        bool Enable = false; // world esp color by rarity
+        float CommonColor[4] = { 0.8f, 0.8f, 0.8f, 1.f };
+        float RareColor[4] = { 0.2f, 0.5f, 1.f,  1.f };
+        float EpicColor[4] = { 1.f,  0.8f, 0.1f, 1.f };
+    }Rarity;
 };
 
 #endif
