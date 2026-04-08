@@ -13,11 +13,11 @@
 struct SETTINGS {
     int iConfig = 0;
     int oldiConfig = 0;
-    std::vector<std::string> InstalledFonts;
+    std::vector<std::string> InstalledFonts = { "FortFont", "VerdanaFont" };
     std::vector<std::string> AvailableFonts;
     struct AimStruct {
         bool Enable = true;
-        bool VisibilityCheck = true;
+        int VisibilityCheck = 0; //0 = Disabled, 1 = Default, 2 = Raycast
         bool RecoilControl = true;
         bool IgnoreKnocked = false;
         bool IgnoreDriving = false;
@@ -180,14 +180,6 @@ struct SETTINGS {
                 float NonVisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
                 int TeamColorAlpha = 255;//0-255
             }Skeleton;
-
-            struct {
-                bool Enable = true;
-                bool HealthGradient = true;
-                int position = 1; //0 = top, 1 = bottom, 2 = left, 3 = right
-                float Thickness = 4.f;//1-5
-                int ColorAlpha = 255;
-            }Health;
 
             struct {
                 bool Enable = true;
@@ -375,6 +367,7 @@ struct SETTINGS {
         int RenderFPS = 144;//30-360 //The cheat render FPS limit
         bool SpectatorCount = true;
         int MenuKey = VK_INSERT;
+        bool VSync = false;
     }Configs;
     struct {
         bool Enable = false; // world esp color by rarity
