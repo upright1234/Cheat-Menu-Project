@@ -255,6 +255,11 @@ struct SETTINGS {
                 false, false, false, false, false, false, false, false,
                 false, false, false, false, false, false, false, false
             };
+            bool PickupRarityFilter[4] = { true, true, true, true };
+            bool PickupCategoryFilter[22] = {
+                true, true, true, true, true, true, true, true, true, true, true,
+                true, true, true, true, true, true, true, true, true, true, true
+            };
         }Items;
     }Visuals;
     struct {
