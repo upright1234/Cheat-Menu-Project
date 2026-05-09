@@ -62,6 +62,9 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
         ("Hop-Up"),
         ("Laser Sight")
     };
+    std::vector<std::string> bodyStyles = { "None", "Pink", "Pink Visible Only", "Pulsing 1", "Pulsing Line Invisible Only", "Dark Pulsing Line", "Sharp Pulsing Visible Only", "Sharp Pulsing", "Pulsing Red Line", "Fast Pulsing Invisible", "Pulsing Up", "Solid Pulsing", "Solid Pulsing 2", "Bright", "Bright 2", "Light", "Light Solid", "Red Pulsing Visible Only", "Wave", "Shaded Visible", "Wireframe", "Wireframe Visible Only", "Black", "Black Visible Only" };
+    std::vector<std::string> outlineStyles = { "None", "Bright", "Bright Invisible Only", "Dark", "Pink", "White", "Gold Flashing", "Gold", "Brown", "Wave", "Red", "Red Bright", "Heartbeat Visible Only", "Green Invisible Only", "Orange", "Visible Only", "Red" };
+
 
     //Install font example
     static int selectedSystemFont = 0;

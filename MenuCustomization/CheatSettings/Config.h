@@ -3,14 +3,14 @@
 #include <string>
 #include <vector>
 
-#define IsApex 0
+#define IsApex 1
 #define IsArc 0
 #define IsFortnite 0
 #define IsBO6 0
 #define IsMarvel 0
 #define IsMW19 0
 #define IsMW3 0
-#define IsR6 1
+#define IsR6 0
 #define IsRust 0
 #define IsValorant 0
 #define IsPUBG 0
