@@ -77,7 +77,8 @@ struct SETTINGS {
             bool VisibilityCheck = true;
             bool ShowIndicator = true;
             float IndicatorColor[4] = { 0.0f, 1.0f, 0.5f, 0.8f };
-            float FontSize = 10.f;
+            float FontSize = 10.f; //10-30
+            int Mode = 0; // 0 = Automatic, 1 = DrawOnly
         }SkyNade;
     }Aim;
     AimStruct aimbot[7]; // AR, DMR, LMG, Pistol, Shotgun, SMG, Sniper
