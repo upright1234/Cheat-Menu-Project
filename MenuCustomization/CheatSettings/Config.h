@@ -3,10 +3,12 @@
 #include <string>
 #include <vector>
 
-#define IsApex 1
+#define IsApex 0
 #define IsArc 0
 #define IsFortnite 0
 #define IsBO6 0
+#define IsBO7Int 0
+#define IsBO7Ext 1
 #define IsMarvel 0
 #define IsMW19 0
 #define IsMW3 0

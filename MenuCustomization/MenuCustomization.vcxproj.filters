@@ -84,6 +84,12 @@
     <ClCompile Include="GUI\Games\R6.cpp">
       <Filter>GUI\Games</Filter>
     </ClCompile>
+    <ClCompile Include="GUI\Games\BO7Ext.cpp">
+      <Filter>GUI\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="GUI\Games\BO7Int.cpp">
+      <Filter>GUI\Games</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Imgui\imconfig.h">
@@ -162,6 +168,12 @@
       <Filter>Arquivos de Cabeçalho\Games</Filter>
     </ClInclude>
     <ClInclude Include="CheatSettings\Games\R6.h">
+      <Filter>Arquivos de Cabeçalho\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="CheatSettings\Games\BO7Ext.h">
+      <Filter>Arquivos de Cabeçalho\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="CheatSettings\Games\BO7Int.h">
       <Filter>Arquivos de Cabeçalho\Games</Filter>
     </ClInclude>
   </ItemGroup>
