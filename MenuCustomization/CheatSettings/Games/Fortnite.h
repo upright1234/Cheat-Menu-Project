@@ -24,6 +24,7 @@ struct SETTINGS {
         bool IgnoreBots = false;
         bool WeaponOnly = false;
         bool Predict = true;
+        bool MemoryAim = false;
 
         bool TriggerBot = false;
         int TriggerKey = VK_XBUTTON1;
