@@ -128,6 +128,39 @@ struct SETTINGS {
                 int TeamColorAlpha = 255;//0-255
                 int FontStyle = 0;
             }Weapon;
+			
+			struct {
+				bool Enable = false;
+				int ColorType = 0; //0 = static, 1 = by team, 2 = by visible
+				int position = 0; //0 = top, 1 = bottom, 2 = left, 3 = right
+				float StaticColor[4] = { 1.f, 0.85f, 0.2f, 1.f };
+				float VisibleColor[4] = { 1.f, 0.85f, 0.2f, 1.f };
+				float NonVisibleColor[4] = { 0.6f, 0.6f, 0.6f, 0.3f };
+				int TeamColorAlpha = 255;//0-255
+				int FontStyle = 0;
+			}Rank;
+
+			struct {
+				bool Enable = false;
+				int ColorType = 0; //0 = static, 1 = by team, 2 = by visible
+				int position = 0; //0 = top, 1 = bottom, 2 = left, 3 = right
+				float StaticColor[4] = { 0.5f, 0.9f, 1.f, 1.f };
+				float VisibleColor[4] = { 0.5f, 0.9f, 1.f, 1.f };
+				float NonVisibleColor[4] = { 0.6f, 0.6f, 0.6f, 0.3f };
+				int TeamColorAlpha = 255;//0-255
+				int FontStyle = 0;
+			}Platform;
+
+			struct {
+				bool Enable = false;
+				int ColorType = 0; //0 = static, 1 = by team, 2 = by visible
+				int position = 0; //0 = top, 1 = bottom, 2 = left, 3 = right
+				float StaticColor[4] = { 1.f, 1.f, 1.f, 1.f };
+				float VisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
+				float NonVisibleColor[4] = { 0.6f, 0.6f, 0.6f, 0.3f };
+				int TeamColorAlpha = 255;//0-255
+				int FontStyle = 0;
+			}Kills;
 
             struct {
                 bool Enable = true;
