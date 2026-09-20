@@ -173,6 +173,7 @@
     <ClCompile Include="GUI\Games\MW3BO6.cpp" />
     <ClCompile Include="GUI\Games\PUBG.cpp" />
     <ClCompile Include="GUI\Games\R6.cpp" />
+    <ClCompile Include="GUI\Games\WarDogs.cpp" />
     <ClCompile Include="GUI\Games\Rust.cpp" />
     <ClCompile Include="GUI\GUI.cpp" />
     <ClCompile Include="Imgui\imgui.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="CheatSettings\Games\MW3.h" />
     <ClInclude Include="CheatSettings\Games\PUBG.h" />
     <ClInclude Include="CheatSettings\Games\R6.h" />
+    <ClInclude Include="CheatSettings\Games\WarDogs.h" />
     <ClInclude Include="CheatSettings\Games\Rust.h" />
     <ClInclude Include="GUI\custom.hpp" />
     <ClInclude Include="GUI\etc_element.h" />

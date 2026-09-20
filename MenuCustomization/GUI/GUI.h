@@ -11,6 +11,7 @@
 #include "../CheatSettings/Games/Arc.h"
 #include "../CheatSettings/Games/R6.h"
 #include "../CheatSettings/Games/Rust.h"
+#include "../CheatSettings/Games/WarDogs.h"
 #include "../CheatSettings/Config.h"
 #include <d3d11.h>
 #include "../Imgui/imgui.h"

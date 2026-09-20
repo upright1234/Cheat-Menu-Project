@@ -66,7 +66,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
     std::vector<std::string> outlineStyles = { "None", "Bright", "Bright Invisible Only", "Dark", "Pink", "White", "Gold Flashing", "Gold", "Brown", "Wave", "Red", "Red Bright", "Heartbeat Visible Only", "Green Invisible Only", "Orange", "Visible Only", "Red" };
 
 
-    //Install font example
+    /*//Install font example
     static int selectedSystemFont = 0;
     ImGui::Combo((("Available System Fonts")), &selectedSystemFont, Settings->AvailableFonts);
     if (ImGui::Button((("Load Font")), { 100, 25 })) {
@@ -113,6 +113,6 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
             g_pConfig->CreateConfig(cfgname);
         }
 
-    }ImGui::EndGroup();
+    }ImGui::EndGroup();*/
 }
 #endif

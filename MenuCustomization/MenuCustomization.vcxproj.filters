@@ -84,6 +84,9 @@
     <ClCompile Include="GUI\Games\R6.cpp">
       <Filter>GUI\Games</Filter>
     </ClCompile>
+    <ClCompile Include="GUI\Games\WarDogs.cpp">
+      <Filter>GUI\Games</Filter>
+    </ClCompile>
     <ClCompile Include="GUI\Games\BO7Ext.cpp">
       <Filter>GUI\Games</Filter>
     </ClCompile>
@@ -168,6 +171,9 @@
       <Filter>Arquivos de Cabeçalho\Games</Filter>
     </ClInclude>
     <ClInclude Include="CheatSettings\Games\R6.h">
+      <Filter>Arquivos de Cabeçalho\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="CheatSettings\Games\WarDogs.h">
       <Filter>Arquivos de Cabeçalho\Games</Filter>
     </ClInclude>
     <ClInclude Include="CheatSettings\Games\BO7Ext.h">
