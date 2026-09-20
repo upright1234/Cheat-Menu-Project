@@ -12,9 +12,15 @@
 
 char cfgname[30] = "NewSetting";
 void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
+    if (Settings->selectedWeapon < 0 || Settings->selectedWeapon >= kWDWeaponCategoryCount)
+        Settings->selectedWeapon = 0;
+
+    SETTINGS::AimStruct* currentAimSettings = Settings->Aim.ByWeapon
+        ? &Settings->aimbot[Settings->selectedWeapon]
+        : &Settings->Aim;
 
     //example force disable option
-    Settings->Aim.Enable = false;
+    currentAimSettings->Enable = false;
 
     if (!ShowMenu)
         return;
@@ -38,8 +44,18 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
         }
     }ImGui::EndGroup();
 
+    ImGui::Checkbox("Configuration By Weapon", &Settings->Aim.ByWeapon);
+    if (Settings->Aim.ByWeapon)
+        ImGui::Combo("Current Weapon", &Settings->selectedWeapon, kWDWeaponCategoryNames,
+            kWDWeaponCategoryCount, kWDWeaponCategoryCount);
+
+    currentAimSettings = Settings->Aim.ByWeapon
+        ? &Settings->aimbot[Settings->selectedWeapon]
+        : &Settings->Aim;
+    currentAimSettings->Enable = false;
+
     //Aimbot hitbox example (int index of the list)
-    ImGui::Combo("HitBox", &Settings->Aim.HitBox, HitBoxes);
+    ImGui::Combo("HitBox", &currentAimSettings->HitBox, HitBoxes);
 
     //Install font example
     static int selectedSystemFont = 0;

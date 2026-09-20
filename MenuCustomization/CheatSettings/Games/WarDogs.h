@@ -45,6 +45,12 @@ inline const char* const kWDCategoryNames[kWDCategoryCount] = {
     "Ammo"
 };
 
+constexpr int kWDWeaponCategoryCount = 9;
+inline const char* const kWDWeaponCategoryNames[kWDWeaponCategoryCount] = {
+    "Assault Rifles", "SMGs", "Shotguns", "LMGs", "Marksman Rifles",
+    "Sniper Rifles", "Bows", "Sidearms", "Launchers"
+};
+
 // Groups that share one max distance (WorldEsp.GroupDistance[]). Ammo has no group: it is a toggle + color in the
 // World ESP list and uses WorldEsp.MaxDistance (like containers, bodies and deployables).
 enum WDItemGroup : int { WDG_Weapons = 0, WDG_Equipment, WDG_Gear, WDG_Attachments, WDG_Count };
@@ -85,9 +91,11 @@ struct VehicleStyle {
 struct SETTINGS {
     int iConfig = 0;
     int oldiConfig = 0;
+    int selectedWeapon = 0;
     std::vector<std::string> InstalledFonts = { "FortFont", "VerdanaFont" };
     std::vector<std::string> AvailableFonts;
     struct AimStruct{
+        bool ByWeapon = false;
         bool Enable = true;
         bool MemoryAimbot = false;
         bool VisibilityCheck = true;
@@ -146,6 +154,7 @@ struct SETTINGS {
         int HealBotKey = VK_XBUTTON2;         // hold to target allies instead of enemies
 
     }Aim;
+    AimStruct aimbot[kWDWeaponCategoryCount];
 
     struct VisualsStr{
         struct PlayerStr {
