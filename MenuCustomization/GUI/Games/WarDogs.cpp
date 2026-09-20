@@ -26,7 +26,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
         return;
 
     std::vector<std::string> ColorTypes = { ("Static"), ("By Team"), ("By Visible") };
-    std::vector<std::string> HitBoxes = { ("Head"), ("Chest"), ("Body"), ("Random") };
+    const char* const HitBoxes[] = { "Head", "Chest", "Body", "Random" };
 
     ImGui::BeginGroup();
     {
@@ -55,7 +55,7 @@ void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
     currentAimSettings->Enable = false;
 
     //Aimbot hitbox example (int index of the list)
-    ImGui::Combo("HitBox", &currentAimSettings->HitBox, HitBoxes);
+    ImGui::Combo("HitBox", &currentAimSettings->HitBox, HitBoxes, IM_ARRAYSIZE(HitBoxes), IM_ARRAYSIZE(HitBoxes));
 
     //Install font example
     static int selectedSystemFont = 0;

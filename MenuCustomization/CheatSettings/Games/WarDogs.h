@@ -11,15 +11,13 @@
 
 #if IsWarDogs
 
-// Item categories: the index of WorldEsp.Categories.Style[]. WDC_Other = anything the cheat could not classify:
-// it is never drawn, so do not put it in the menu.
 enum WDCategory : int {
     WDC_Other = 0,
     // Weapons
     WDC_AssaultRifle, WDC_SMG, WDC_Shotgun, WDC_LMG, WDC_MarksmanRifle, WDC_SniperRifle, WDC_Bow, WDC_Sidearm, WDC_Launcher,
     // Equipment
     WDC_Tool, WDC_Medicine, WDC_Spotter, WDC_Explosive, WDC_Smoke,
-    // Vehicle types: NOT used by the item tables (a vehicle is configured in Vehicles.Categories[])
+    // Vehicle types
     WDC_LandTransport, WDC_Tank, WDC_Artillery, WDC_AirCombat, WDC_AirTransport, WDC_Stationary,
     // More equipment
     WDC_Building, WDC_Misc, WDC_VehicleSupply,
@@ -51,26 +49,21 @@ inline const char* const kWDWeaponCategoryNames[kWDWeaponCategoryCount] = {
     "Sniper Rifles", "Bows", "Sidearms", "Launchers"
 };
 
-// Groups that share one max distance (WorldEsp.GroupDistance[]). Ammo has no group: it is a toggle + color in the
-// World ESP list and uses WorldEsp.MaxDistance (like containers, bodies and deployables).
 enum WDItemGroup : int { WDG_Weapons = 0, WDG_Equipment, WDG_Gear, WDG_Attachments, WDG_Count };
 constexpr int kWDItemGroupCount = 4;
 inline const char* const kWDItemGroupNames[kWDItemGroupCount] = { "Weapons", "Equipment", "Gear", "Attachments" };
 
-// The categories of each group, in the order the cheat's own menu shows them.
 inline const WDCategory kWDGroupWeapons[] = { WDC_AssaultRifle, WDC_SMG, WDC_Shotgun, WDC_LMG, WDC_MarksmanRifle, WDC_SniperRifle, WDC_Bow, WDC_Sidearm, WDC_Launcher };
 inline const WDCategory kWDGroupEquipment[] = { WDC_Tool, WDC_Medicine, WDC_Spotter, WDC_Explosive, WDC_Smoke, WDC_Building, WDC_VehicleSupply, WDC_Misc };
 inline const WDCategory kWDGroupGear[] = { WDC_Helmet, WDC_Armor, WDC_Vest, WDC_Backpack, WDC_Traversal };
 inline const WDCategory kWDGroupAttachments[] = { WDC_Magazine, WDC_Optic, WDC_Muzzle, WDC_Barrel, WDC_Stock, WDC_Grip, WDC_Handguard };
 
-// Vehicle types: the index of Vehicles.Categories[].
 enum WDVehicleGroup : int { WDV_LandTransport = 0, WDV_Tank, WDV_Artillery, WDV_AirCombat, WDV_AirTransport, WDV_Stationary, WDV_Other, WDV_Count };
 constexpr int kWDVehicleGroupCount = 7;
 inline const char* const kWDVehicleGroupNames[kWDVehicleGroupCount] = {
     "Land Transport", "Tanks", "Artillery", "Air Combat", "Air Transport", "Stationary", "Other Vehicles"
 };
 
-// One toggle + color of an item category.
 struct EntityStyle {
     bool Enable;
     float Color[4];
@@ -80,7 +73,6 @@ struct EntityStyles {
     EntityStyle Style[kWDCategoryCount];
 };
 
-// One toggle + friendly / enemy / unknown color of a vehicle type.
 struct VehicleStyle {
     bool Enable;
     float FriendlyColor[4];
