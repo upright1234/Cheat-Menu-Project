@@ -354,6 +354,8 @@ struct SETTINGS {
         int MenuKey = VK_INSERT;
         bool TeamCheck = true;
         bool VSync = false;
+        bool SpectatorCount = true;
+        bool AdminSpectatorAlert = true;
 
         // Exploits (weapon / character attribute patching, sdk/WeaponExploits.cpp). *Percent = strength.
         bool NoRecoil = false;
@@ -375,6 +377,9 @@ struct SETTINGS {
         bool SpeedHack = false;
         float SpeedHackMultiplier = 1.05f; //1.0-1.1 (10%)
         int SpeedHackFrictionPercent = 100;
+        bool Zoom = false;
+        float ZoomMultiplier = 2.0f;  //1.0-15.0
+
     }Configs;
 };
 #endif
