@@ -372,11 +372,6 @@ struct SETTINGS {
         int InfiniteStaminaPercent = 100;
         bool NoWeight = false;
         int NoWeightPercent = 50; //1-50
-        bool NoHeavyBreathing = false;
-        int NoHeavyBreathingPercent = 100;
-        bool SpeedHack = false;
-        float SpeedHackMultiplier = 1.05f; //1.0-1.1 (10%)
-        int SpeedHackFrictionPercent = 100;
         bool Zoom = false;
         float ZoomMultiplier = 2.0f;  //1.0-15.0
 
