@@ -82,7 +82,7 @@ struct SETTINGS {
 
     }Aim;
 
-    struct VisualsStr {
+    struct VisualsStr{
         struct PlayerStr {
             bool Enable = true;
             int ToggleKey = VK_F6;
@@ -101,11 +101,7 @@ struct SETTINGS {
                 float Size = 5.f;
                 float Thickness = 2.f;
                 bool Filled = false;
-                int ColorType = 0; //0 = static, 1 = by team, 2 = by visible
                 float StaticColor[4] = { 1.f, 0.f, 0.f, 1.f };
-                float VisibleColor[4] = { 1.f, 0.2f, 0.2f, 1.f };
-                float NonVisibleColor[4] = { 0.7f, 0.7f, 0.7f, 0.3f };
-                int TeamColorAlpha = 255;
             }HeadCircle;
 
             struct {
@@ -115,33 +111,21 @@ struct SETTINGS {
                 int rounding = 10;
                 float Thickness = 2.f;
                 float Width = 0.45f;
-                int ColorType = 1; //0 = static, 1 = by team, 2 = by visible
                 float FillColor[4] = { 0.f, 0.f, 0.f, .2f };
                 float StaticColor[4] = { 0.8f, 0.8f, 0.9f, 1.f };
-                float VisibleColor[4] = { 1.f, 0.2f, 0.2f, 1.f };
-                float NonVisibleColor[4] = { 0.6f, 0.6f, 0.6f, 0.3f };
-                int TeamColorAlpha = 255;
             }Box;
 
             struct {
                 bool Enable = false;
                 int Position = 0; //0 = top, 1 = bottom
                 float Thickness = 1.f;
-                int ColorType = 1; //0 = static, 1 = by team, 2 = by visible
                 float StaticColor[4] = { 0.6f, 0.4f, 1.f, 1.f };
-                float VisibleColor[4] = { 1.f, 0.2f, 0.2f, 1.f };
-                float NonVisibleColor[4] = { 0.6f, 0.6f, 0.6f, 0.3f };
-                int TeamColorAlpha = 255;
             }Lines;
 
             struct {
                 bool Enable = true;
                 float Thickness = 1.75f;
-                int ColorType = 2; //0 = static, 1 = by team, 2 = by visible
                 float StaticColor[4] = { 0.f, 1.f, 1.f, 1.f };
-                float VisibleColor[4] = { 1.f, 0.2f, 0.2f, 1.f };
-                float NonVisibleColor[4] = { 0.6f, 0.6f, 0.6f, 0.3f };
-                int TeamColorAlpha = 255;
             }Skeleton;
 
             struct {
@@ -162,11 +146,7 @@ struct SETTINGS {
             struct {
                 bool Enable = true;
                 int position = 1;
-                int ColorType = 0;
                 float StaticColor[4] = { 1.f, 1.f, 1.f, 1.f };
-                float VisibleColor[4] = { 1.f, 1.f, 1.f, 1.f };
-                float NonVisibleColor[4] = { 0.8f, 0.8f, 0.8f, 0.5f };
-                int TeamColorAlpha = 255;
                 int FontStyle = 0;
             }Distance;
 
