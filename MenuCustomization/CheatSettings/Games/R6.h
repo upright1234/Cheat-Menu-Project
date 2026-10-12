@@ -150,6 +150,14 @@ struct SETTINGS {
                 int FontStyle = 0;
             }Distance;
 
+            struct {
+                bool Enable = true;
+                bool Gradient = true;
+                int position = 2; //0 = top, 1 = bottom, 2 = left, 3 = right
+                float Thickness = 4.f;
+                int ColorAlpha = 205;
+                bool ShowValue = false;
+            }Health;
         };
         PlayerStr Players;
 
