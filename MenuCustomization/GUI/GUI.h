@@ -1,4 +1,6 @@
 #pragma once
+// imgui.h first: some settings headers (R6.h, Rust.h) use ImVec2
+#include "../Imgui/imgui.h"
 #include "../CheatSettings/Games/PUBG.h"
 #include "../CheatSettings/Games/BO6.h"
 #include "../CheatSettings/Games/BO7Ext.h"
@@ -14,7 +16,6 @@
 #include "../CheatSettings/Games/WarDogs.h"
 #include "../CheatSettings/Config.h"
 #include <d3d11.h>
-#include "../Imgui/imgui.h"
 
 
 extern void InitMyMenu(ID3D11Device* g_pd3dDevice);

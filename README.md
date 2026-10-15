@@ -158,6 +158,34 @@ The loader takes care of sharing `Settings` with the real cheat and managing the
 
 ---
 
+### Local Preview (no loader, no upload)
+
+`Preview/MenuPreview.vcxproj` builds the same GUI sources plus `DebugMain.cpp` into a standalone window, so you can see the menu without building the DLL or using the panel.
+
+```powershell
+.\Preview\preview.ps1           # build (Debug) and launch
+.\Preview\preview.ps1 -Watch    # rebuild + relaunch every time a GUI/CheatSettings file is saved
+```
+
+- The game is whichever `Is<Game>` is set to `1` in `CheatSettings/Config.h`, same as the DLL.
+- `INSERT` toggles the menu, `F2` cycles the backdrop (gray / black / light).
+- Settings start from the struct defaults; config load/save are no-ops.
+- `Preview/shim/d3dx11.h` stands in for the legacy DirectX SDK, so the preview needs only Visual Studio (or Build Tools) with the C++ workload.
+- When you add a `.cpp` to `MenuCustomization.vcxproj`, add it to `MenuPreview.vcxproj` too.
+- `-Game <name>` previews another game without editing `Config.h`; `-All` compiles every game's menu and reports pass/fail.
+
+### Shared look and logo
+
+Every game menu is built on `GUI/MenuKit.h` (header, sidebar, panels, widgets, palette); the ImGui colors are set in `InitMyMenu` (`GUI/GUI.cpp`). `GUI/Games/WarDogs.cpp` is the reference for how a game menu uses it.
+
+The header logo is embedded in the DLL as raw pixels in `GUI/LogoData.h` (source: `GUI/logo.png`). To change it:
+
+```powershell
+.\Preview\make_logo.ps1 -Src path\to\logo.png -Out MenuCustomization\GUI\LogoData.h -Height 48
+```
+
+---
+
 ### Panel Integration / Usage
 
 The MenuCustomization DLL is integrated through the reseller panel.

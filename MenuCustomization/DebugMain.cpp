@@ -191,7 +191,7 @@ int main()
     RECT rc = { 0, 0, g_GameWidth, g_GameHeight };
     HWND hwnd = ::CreateWindowW(
         wc.lpszClassName,
-        L"Menu DX11 Standalone",
+        L"Menu Preview  (INSERT: toggle menu, F2: backdrop)",
         WS_OVERLAPPEDWINDOW,
         100,
         100,
@@ -223,15 +223,17 @@ int main()
     ParseConfigs();
     Read();
 
+    // InitializeMenu (main.cpp) has no return on its success path, so its result is unreliable; ignore it.
     int resellerColor[4] = { 255, 255, 255, 255 };
-    if (!InitializeMenu(hwnd, g_pd3dDevice, g_pd3dDeviceContext, resellerColor))
-    {
-        CleanupRenderTarget();
-        CleanupDeviceD3D();
-        ::DestroyWindow(hwnd);
-        ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
-        return 1;
-    }
+    InitializeMenu(hwnd, g_pd3dDevice, g_pd3dDeviceContext, resellerColor);
+
+    // F2 cycles the backdrop so the menu can be judged against dark and bright game scenes
+    const float backdrops[][4] = {
+        { 0.17f, 0.19f, 0.22f, 1.0f },
+        { 0.00f, 0.00f, 0.00f, 1.0f },
+        { 0.55f, 0.60f, 0.62f, 1.0f },
+    };
+    int backdrop = 0;
 
     MSG msg;
     ZeroMemory(&msg, sizeof(msg));
@@ -257,13 +259,14 @@ int main()
         g_GameWidth  = client.right - client.left;
         g_GameHeight = client.bottom - client.top;
 
-        float clearColor[4] = { 0.0f,0.0f,0.0f,0.0f };
+        if (GetForegroundWindow() == hwnd && (GetAsyncKeyState(VK_F2) & 1))
+            backdrop = (backdrop + 1) % IM_ARRAYSIZE(backdrops);
+
+        // Same call order the loader uses: RenderMenu -> EndRender -> RenderDx11
         RenderMenu(&g_ShowMenu, g_GameX, g_GameY, g_GameWidth, g_GameHeight, &g_Settings, &g_Config, g_MouseWheel);
-        g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clearColor);
-        ImGui::Render();
         EndRender();
         g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, NULL);
-        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+        g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, backdrops[backdrop]);
         g_MouseWheel = 0.f;
         RenderDx11();
         g_pSwapChain->Present(g_Settings.Configs.VSync ? 1 : 0, 0);

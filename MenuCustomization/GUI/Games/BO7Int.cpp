@@ -6,655 +6,477 @@
 #include "../main.h"
 #include "../etc_element.h"
 
-#if IsMW3 || IsBO6
-float animation_ = 0.0f;
-
-#define ALPHA (ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_NoDragDrop | ImGuiColorEditFlags_PickerHueBar)
-#define NO_ALPHA (ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_NoDragDrop | ImGuiColorEditFlags_PickerHueBar)
+#if IsBO7Int
+#include "../MenuKit.h"
+using namespace kit;
 
 char cfgname[30] = "NewSetting";
-int selectedItem = 0;
-bool firstTime = true;
+
+namespace {
+
+const char* const kHitBoxes[]        = { "Head", "Chest", "Body", "Random" };
+const char* const kPositions[]       = { "Top", "Bottom", "Left", "Right" };
+const char* const kTopBottom[]       = { "Top", "Bottom" };
+const char* const kBoxStyles[]       = { "Square", "Corner" };
+const char* const kTargetShapes[]    = { "Circle", "Triangle" };
+const char* const kOffscreenStyles[] = { "Triangle", "Dot" };
+const char* const kRarities[]        = { "Grey", "Green", "Blue", "Purple", "Gold" };
+const char* const kPadKeys[] = { "None", "D-Pad Up", "D-Pad Down", "D-Pad Left", "D-Pad Right",
+    "Start", "Back", "L3", "R3", "Gamepad A", "Gamepad B", "Gamepad X", "Gamepad Y",
+    "Left Bumper", "Right Bumper", "Left Trigger", "Right Trigger" };
+
+enum Page { P_Aimbot, P_Trigger, P_Players, P_Bots, P_Loot, P_Radar, P_Settings, P_Configs, P_Count };
+
+const char* const kSections[] = { "COMBAT", "VISUALS", "SYSTEM" };
+const NavItem kPages[P_Count] = {
+    { "Aimbot",     "Targeting, smoothing, FOV and aim overlays", 0 },
+    { "Triggerbot", "Auto fire and kill switch",                  0 },
+    { "Players",    "Boxes, skeletons, labels and alerts",        1 },
+    { "Bots",       "Separate ESP style for AI players",          1 },
+    { "Loot",       "Item ESP by type and minimum rarity",        1 },
+    { "Radar",      "Mini radar and off-screen indicators",       1 },
+    { "Settings",   "Menu key, performance, game and fonts",            2 },
+    { "Configs",    "Save, load and create presets",              2 },
+};
+
+
+using PlayerEsp = SETTINGS::VisualsStr::PlayerStr;
+using ItemType = decltype(SETTINGS::VisualsStr{}.Items.Weapon);
+
+// Opens a panel for a player label (name / weapon / distance / ...); caller adds extras and calls EndPanel()
+template <typename T>
+void BeginLabelPanel(const char* title, T& label, const std::vector<std::string>& fonts) {
+    BeginPanel(title);
+    ImGui::Checkbox("Enable", &label.Enable);
+    if (label.Enable) {
+        ComboRow("Position", &label.position, kPositions, IM_ARRAYSIZE(kPositions));
+        ComboRow("Font", &label.FontStyle, fonts);
+        ColorMode(label);
+    }
+}
+
+// Item type toggle + compact minimum-rarity combo on one row (a full kComboW combo would overlap the 200px checkbox)
+void ItemRow(const char* label, ItemType& item) {
+    constexpr float w = 96.f;
+    ImGui::PushID(label);
+    ImGui::Checkbox(label, &item.Enable);
+    ImGui::SameLine(RightEdge() - w);
+    ImGui::SetNextItemWidth(w + 60.f); // custom BeginCombo subtracts 60px
+    ImGui::Combo("##rarity", &item.MinRarity, kRarities, IM_ARRAYSIZE(kRarities), IM_ARRAYSIZE(kRarities));
+    ImGui::PopID();
+}
+
+void PageAimbot(SETTINGS* s) {
+    auto& aim = s->Aimbot;
+    BeginColumns();
+    BeginPanel("Aimbot");
+    {
+        ToggleKey("Enable", &aim.Enable, &aim.ToggleKey);
+        KeyRow("Aim Key", &aim.HoldPrimaryKey);
+        KeyRow("Secondary Key", &aim.HoldSecondaryKey);
+        KeyRow("Switch To Head", &aim.SwitchToHeadKey);
+        ComboRow("Hitbox", &aim.HitBox, kHitBoxes, IM_ARRAYSIZE(kHitBoxes));
+        SliderF("Smoothing", &aim.Smooth, 1.f, 10.f);
+        SliderI("Max Distance", &aim.MaxDistance, 1, 800, "%d m");
+    }
+    EndPanel();
+
+    BeginPanel("Behavior");
+    {
+        ImGui::Checkbox("Visibility Check", &aim.VisibilityCheck);
+        ImGui::Checkbox("Predict Movement", &aim.Predict);
+        if (BeginRiskyToggle("Memory Aim/Controller", &aim.MemoryAimbot, "Controller Binds")) {
+            ComboRow("Aim", &aim.ControllerPrimaryKey, kPadKeys, IM_ARRAYSIZE(kPadKeys));
+            ComboRow("Secondary", &aim.ControllerSecondaryKey, kPadKeys, IM_ARRAYSIZE(kPadKeys));
+            ComboRow("Switch To Head", &aim.ControllerSwitchToHeadKey, kPadKeys, IM_ARRAYSIZE(kPadKeys));
+            EndRiskyToggle();
+        }
+        RiskyCheckbox("Aim Lock", &aim.AimLock);
+        ImGui::Checkbox("Ignore Bots", &aim.IgnoreBots);
+        ImGui::Checkbox("Ignore Knocked", &aim.IgnoreKnocked);
+        ImGui::Checkbox("Keep Target", &aim.SaveTarget);
+        if (aim.SaveTarget)
+            SliderF("Target Switch Delay", &aim.TargetSwitchDelay, 0.f, 5.f, "%.1f s");
+        ImGui::Checkbox("Dead Zone", &aim.DeadZone);
+        if (aim.DeadZone)
+            SliderF("Dead Zone Radius", &aim.DeadZoneRadius, 1.f, 20.f);
+    }
+    EndPanel();
+
+    BeginPanel("Weapon Control");
+    {
+        RiskyCheckbox("Recoil Control", &aim.RecoilControl);
+        if (aim.RecoilControl)
+            SliderF("Recoil Strength", &aim.RecoilSlider, 0.1f, 1.f, "%.2f");
+        RiskyCheckbox("Spread Control", &aim.SpreadControl);
+    }
+    EndPanel();
+
+    NextColumn();
+    BeginPanel("Field of View");
+    {
+        SliderF("Min FOV", &aim.MinFOV, 1.f, aim.MaxFOV, "%.0f");
+        SliderF("Max FOV", &aim.MaxFOV, aim.MinFOV, 180.f, "%.0f");
+        ImGui::Checkbox("Dynamic FOV", &aim.CustomFov);
+        if (aim.CustomFov) {
+            SliderF("Distance Coefficient", &aim.DistanceCoefficient, 0.f, 3.f, "%.2f");
+            SliderF("Time Coefficient", &aim.TimeCoefficient, 0.f, 3.f, "%.2f");
+        }
+        SubHeader("Circle");
+        ToggleColor("Draw FOV", &aim.DrawFov, aim.FovColor);
+        if (aim.DrawFov)
+            SliderF("Thickness", &aim.FovThickness, 1.f, 5.f);
+    }
+    EndPanel();
+
+    BeginPanel("Target Indicator");
+    {
+        ToggleColor("Draw Target", &aim.DrawTarget, aim.TargetCollor);
+        if (aim.DrawTarget) {
+            ComboRow("Shape", &aim.TargetType, kTargetShapes, IM_ARRAYSIZE(kTargetShapes));
+            SliderF("Thickness", &aim.TargetThickness, 1.f, 5.f);
+        }
+    }
+    EndPanel();
+
+    BeginPanel("Crosshair");
+    {
+        ToggleColor("Draw Crosshair", &aim.DrawCrossHair, aim.CrossHairColor);
+        if (aim.DrawCrossHair)
+            SliderF("Thickness", &aim.CrossHairThickness, 1.f, 5.f);
+    }
+    EndPanel();
+    EndColumns();
+}
+
+void PageTrigger(SETTINGS* s) {
+    auto& aim = s->Aimbot;
+    BeginColumns();
+    BeginPanel("Triggerbot");
+    {
+        ImGui::Checkbox("Enable", &aim.TriggerBot);
+        if (aim.TriggerBot) {
+            KeyRow("Trigger Key", &aim.TriggerKey);
+            ComboRow("Controller Key", &aim.ControllerTriggerKey, kPadKeys, IM_ARRAYSIZE(kPadKeys));
+            SliderF("Delay", &aim.TriggerDelay, 0.f, 1.f, "%.2f s");
+            SliderF("FOV", &aim.TriggerFOV, 1.f, 10.f);
+            ToggleColor("Draw FOV", &aim.TriggerBotDrawFOV, aim.TriggerBotFOVColor);
+            if (aim.TriggerBotDrawFOV)
+                SliderF("Thickness", &aim.TriggerBotFOVThickness, 1.f, 5.f);
+        }
+    }
+    EndPanel();
+
+    NextColumn();
+    BeginPanel("Kill Switch");
+    {
+        ToggleKey("Enable", &aim.KillSwitch, &aim.KillSwitchKey);
+        ImGui::Checkbox("Auto Kill Switch", &aim.AutoKillSwitch);
+        if (aim.AutoKillSwitch)
+            SliderF("Trigger Distance", &aim.KillSwitchDistance, 0.f, 150.f, "%.0f m");
+    }
+    EndPanel();
+    EndColumns();
+}
+
+// Players and Bots share one layout; Team Check lives in Configs so it is only shown once
+void PageEsp(SETTINGS* s, PlayerEsp& p, const char* title, bool teamCheck) {
+    BeginColumns();
+    BeginPanel(title);
+    {
+        ToggleKey("Enable", &p.Enable, &p.ToggleKey);
+        if (teamCheck)
+            ImGui::Checkbox("Team Check", &s->Configs.TeamCheck);
+        SliderI("Max Distance", &p.MaxDistance, 1, 800, "%d m");
+        SliderF("Min Font Size", &p.MinFontSize, 10.f, p.MaxFontSize, "%.0f px");
+        SliderF("Max Font Size", &p.MaxFontSize, p.MinFontSize, 30.f, "%.0f px");
+        ImGui::Checkbox("Fade With Distance", &p.DistanceTransparency);
+        if (p.DistanceTransparency) {
+            SliderF("Min Opacity", &p.MinTransparency, 0.1f, p.MaxTransparency, "%.2f");
+            SliderF("Max Opacity", &p.MaxTransparency, p.MinTransparency, 1.f, "%.2f");
+        }
+    }
+    EndPanel();
+
+    BeginPanel("Box");
+    {
+        auto& box = p.Box;
+        ImGui::Checkbox("Enable", &box.Enable);
+        if (box.Enable) {
+            ComboRow("Style", &box.Type, kBoxStyles, IM_ARRAYSIZE(kBoxStyles));
+            SliderF("Width", &box.Width, 0.1f, 1.f, "%.2f");
+            SliderF("Thickness", &box.Thickness, 1.f, 5.f);
+            SliderI("Rounding", &box.rounding, 0, 20);
+            ToggleColor("Filled", &box.Filled, box.FillColor);
+            ColorMode(box);
+        }
+    }
+    EndPanel();
+
+    BeginPanel("Skeleton");
+    {
+        ImGui::Checkbox("Enable", &p.Skeleton.Enable);
+        if (p.Skeleton.Enable) {
+            SliderF("Thickness", &p.Skeleton.Thickness, 1.f, 5.f, "%.2f");
+            ColorMode(p.Skeleton);
+        }
+    }
+    EndPanel();
+
+    BeginPanel("Head Circle");
+    {
+        auto& head = p.HeadCircle;
+        ImGui::Checkbox("Enable", &head.Enable);
+        if (head.Enable) {
+            SliderF("Size", &head.Size, 1.f, 10.f);
+            SliderF("Thickness", &head.Thickness, 1.f, 5.f);
+            ImGui::Checkbox("Filled", &head.Filled);
+            ColorMode(head);
+        }
+    }
+    EndPanel();
+
+    BeginPanel("Health Bar");
+    {
+        auto& hp = p.Health;
+        ImGui::Checkbox("Enable", &hp.Enable);
+        if (hp.Enable) {
+            ComboRow("Position", &hp.position, kPositions, IM_ARRAYSIZE(kPositions));
+            SliderF("Thickness", &hp.Thickness, 1.f, 5.f);
+            SliderI("Opacity", &hp.ColorAlpha, 0, 255);
+            ImGui::Checkbox("Gradient", &hp.HealthGradient);
+        }
+    }
+    EndPanel();
+
+    BeginPanel("Snaplines");
+    {
+        auto& lines = p.Lines;
+        ImGui::Checkbox("Enable", &lines.Enable);
+        if (lines.Enable) {
+            ComboRow("Origin", &lines.Position, kTopBottom, IM_ARRAYSIZE(kTopBottom));
+            SliderF("Thickness", &lines.Thickness, 1.f, 5.f);
+            ColorMode(lines);
+        }
+    }
+    EndPanel();
+
+    NextColumn();
+    BeginLabelPanel("Name", p.NickName, s->InstalledFonts);
+    EndPanel();
+
+    BeginLabelPanel("Weapon", p.Weapon, s->InstalledFonts);
+    EndPanel();
+
+    BeginLabelPanel("Distance", p.Distance, s->InstalledFonts);
+    if (p.Distance.Enable)
+        ImGui::Checkbox("Merge With Name", &p.Distance.MergeNickName);
+    EndPanel();
+
+    BeginLabelPanel("Status", p.Status, s->InstalledFonts);
+    EndPanel();
+
+    BeginLabelPanel("K/D/A", p.KDA, s->InstalledFonts);
+    EndPanel();
+
+    BeginPanel("Proximity Alert");
+    {
+        auto& prox = p.ProximityAlerts;
+        ImGui::Checkbox("Enable", &prox.Enable);
+        if (prox.Enable) {
+            SliderF("Radius", &prox.ProximityRadius, 5.f, 200.f, "%.0f m");
+            ImGui::Checkbox("Pulsing Border", &prox.PulsatingBorder);
+            if (prox.PulsatingBorder)
+                SliderF("Border Thickness", &prox.BorderThickness, 1.f, 5.f);
+            ImGui::Checkbox("Warning Text", &prox.ProximityText);
+            if (prox.ProximityText)
+                SliderF("Text Size", &prox.TextSize, 10.f, 50.f, "%.0f px");
+            ColorRow("Alert Color", prox.AlertColor);
+            ColorRow("Text Color", prox.TextColor);
+        }
+    }
+    EndPanel();
+    EndColumns();
+}
+
+void PageLoot(SETTINGS* s) {
+    auto& it = s->Visuals.Items;
+    struct Entry { const char* name; ItemType* item; };
+    const Entry left[] = {
+        { "Weapons", &it.Weapon }, { "Ammo", &it.Ammo }, { "Cash", &it.Cash }, { "Perks", &it.Perks },
+        { "Crates", &it.Crates }, { "Tokens", &it.Tokens }, { "Field Upgrades", &it.FieldUpgrade },
+    };
+    const Entry right[] = {
+        { "Armor Plates", &it.Plate }, { "Tactical", &it.Tactical }, { "Lethal", &it.Lethal },
+        { "Gas Masks", &it.GasMask }, { "Revive Kits", &it.ReviveKit }, { "Contracts", &it.Contracts },
+        { "Keys", &it.Keys },
+    };
+
+    BeginPanel("Loot ESP", ImGui::GetContentRegionAvail().x);
+    {
+        ToggleKey("Enable", &it.Enable, &it.ToggleKey);
+        if (it.Enable) {
+            ComboRow("Font", &it.FontStyle, s->InstalledFonts);
+            SliderI("Max Distance", &it.MaxDistance, 1, 800, "%d m");
+            SliderF("Min Font Size", &it.MinFontSize, 10.f, it.MaxFontSize, "%.0f px");
+            SliderF("Max Font Size", &it.MaxFontSize, it.MinFontSize, 30.f, "%.0f px");
+            const float half = (ImGui::GetContentRegionAvail().x - 8.f) * 0.5f;
+            if (ActionButton("##all_on", "Enable All Types", ImVec2(half, 0.f))) {
+                for (const Entry& e : left) e.item->Enable = true;
+                for (const Entry& e : right) e.item->Enable = true;
+            }
+            ImGui::SameLine(0.f, 8.f);
+            if (ActionButton("##all_off", "Disable All Types", ImVec2(half, 0.f))) {
+                for (const Entry& e : left) e.item->Enable = false;
+                for (const Entry& e : right) e.item->Enable = false;
+            }
+        }
+    }
+    EndPanel();
+
+    if (!it.Enable)
+        return;
+
+    BeginColumns();
+    BeginPanel("Supplies");
+    {
+        Hint("Right: minimum rarity shown");
+        for (const Entry& e : left)
+            ItemRow(e.name, *e.item);
+    }
+    EndPanel();
+
+    NextColumn();
+    BeginPanel("Equipment");
+    {
+        Hint("Right: minimum rarity shown");
+        for (const Entry& e : right)
+            ItemRow(e.name, *e.item);
+    }
+    EndPanel();
+    EndColumns();
+}
+
+void PageRadar(SETTINGS* s) {
+    BeginColumns();
+    BeginPanel("Radar");
+    {
+        auto& r = s->Visuals.Radar;
+        ToggleKey("Enable", &r.Enable, &r.ToggleKey);
+        if (r.Enable) {
+            ImGui::Checkbox("Show Bots", &r.ShowBots);
+            SliderI("Size", &r.Size, 50, 500, "%d px");
+            SliderI("Zoom", &r.Zoom, 1, 100);
+            SliderI("Max Distance", &r.MaxDistance, 1, 800, "%d m");
+            SliderI("Position X", &r.PositionX, 0, 3000);
+            SliderI("Position Y", &r.PositionY, 0, 3000);
+            SubHeader("Markers");
+            SliderF("Min Size", &r.MinSize, 1.f, r.MaxSize);
+            SliderF("Max Size", &r.MaxSize, r.MinSize, 6.f);
+            SliderF("Min Opacity", &r.MinOpacity, 0.1f, r.MaxOpacity, "%.2f");
+            SliderF("Max Opacity", &r.MaxOpacity, r.MinOpacity, 1.f, "%.2f");
+            ColorMode(r);
+        }
+    }
+    EndPanel();
+
+    NextColumn();
+    BeginPanel("Off-screen Indicators");
+    {
+        auto& o = s->Visuals.OutScreen;
+        ToggleKey("Enable", &o.Enable, &o.ToggleKey);
+        if (o.Enable) {
+            ImGui::Checkbox("Show Bots", &o.ShowBots);
+            ComboRow("Style", &o.Type, kOffscreenStyles, IM_ARRAYSIZE(kOffscreenStyles));
+            SliderI("FOV", &o.Fov, 1, 180);
+            SliderI("Max Distance", &o.MaxDistance, 1, 800, "%d m");
+            SliderF("Thickness", &o.Thickness, 1.f, 5.f);
+            SliderF("Min Size", &o.MinSize, 1.f, o.MaxSize, "%.0f px");
+            SliderF("Max Size", &o.MaxSize, o.MinSize, 30.f, "%.0f px");
+            SliderF("Min Opacity", &o.MinOpacity, 0.1f, o.MaxOpacity, "%.2f");
+            SliderF("Max Opacity", &o.MaxOpacity, o.MinOpacity, 1.f, "%.2f");
+            ColorMode(o);
+        }
+    }
+    EndPanel();
+    EndColumns();
+}
+
+void PageSettings(SETTINGS* s, bool* ShowMenu) {
+    auto& c = s->Configs;
+    BeginColumns();
+    BeginPanel("Menu");
+    {
+        KeyRow("Menu Key", &c.MenuKey);
+        if (ActionButton("##hide", "Hide Menu"))
+            *ShowMenu = false;
+    }
+    EndPanel();
+
+    BeginPanel("Performance");
+    {
+        ImGui::Checkbox("VSync", &c.VSync);
+        SliderI("Render FPS", &c.RenderFPS, 30, 1000);
+        SliderI("Game FPS", &c.GameFPS, 30, 1000);
+    }
+    EndPanel();
+
+    BeginPanel("Game");
+    {
+        RiskyCheckbox("Disable Flash Effects", &c.DisableFlashEffects);
+    }
+    EndPanel();
+
+    NextColumn();
+    FontsPanel(s, [s](int font) {
+        for (PlayerEsp* p : { &s->Visuals.Players, &s->Visuals.Bots }) {
+            p->NickName.FontStyle = font;
+            p->Weapon.FontStyle = font;
+            p->Distance.FontStyle = font;
+            p->Status.FontStyle = font;
+            p->KDA.FontStyle = font;
+        }
+        s->Visuals.Items.FontStyle = font;
+    });
+    EndColumns();
+}
+
+} // namespace
 
 void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
-
-
-    if (!ShowMenu)
+    MENU_LOG_FRAME(ShowMenu, Settings, g_pConfig);
+    if (!ShowMenu || !Settings)
         return;
-    
-    const char* ColorTypes[] = {(("Static")), (("By Team")), (("By Visible"))};
-    const char* hitboxes[] = { ("Head"), ("Chest"), ("Body"), ("Random") };
-    const char* boxes[] = { "Square", "Corner" };
-    const char* LinesTypes[] = { ("Top"), ("Middle"), ("Bottom") };
-    const char* HealthTypes[] = { ("Horizontal"), ("Vertical") };
-    const char* AimTargetTypes[] = { ("Circle"), ("Triangle") };
-    const char* rarityOptions[] = { "Grey", "Green", "Blue", "Purple", "Gold" };
-    const char* keysOptions[] = {"None", "D-Pad Up", "D-Pad Down", "D-Pad Left", "D-Pad Right",
-    "Start", "Back", "L3", "R3", "Gamepad A", "Gamepad B", "Gamepad X", "Gamepad Y",
-        "Left Bumper", "Right Bumper", "Left Trigger", "Right Trigger" };
 
+    const Chip chips[] = {
+        { "AIM",   &Settings->Aimbot.Enable },
+        { "ESP",   &Settings->Visuals.Players.Enable },
+        { "LOOT",  &Settings->Visuals.Items.Enable },
+        { "RADAR", &Settings->Visuals.Radar.Enable },
+    };
 
-    //Install font example
-    static int selectedSystemFont = 0;
-    ImGui::Combo((("Available System Fonts")), &selectedSystemFont, Settings->AvailableFonts);
-    if (ImGui::Button((("Load Font")), { 100, 25 })) {
-        if (selectedSystemFont >= 0 && selectedSystemFont < Settings->AvailableFonts.size()) {
-            std::string fontName = Settings->AvailableFonts[selectedSystemFont];
-            if (std::find(Settings->InstalledFonts.begin(), Settings->InstalledFonts.end(), fontName) == Settings->InstalledFonts.end()) {
-                Settings->InstalledFonts.push_back(fontName);
-            }
-        }
+    ShellDesc desc;
+    desc.brand = "BLACK OPS 7";
+    desc.tagline = "internal";
+    desc.sections = kSections;
+    desc.pages = kPages;
+    desc.pageCount = P_Count;
+    desc.chips = chips;
+    desc.chipCount = IM_ARRAYSIZE(chips);
+    desc.menuKey = Settings->Configs.MenuKey;
+
+    static int page = P_Aimbot;
+    BeginShell(desc, page, ShowMenu);
+    switch (page) {
+    case P_Aimbot:   PageAimbot(Settings); break;
+    case P_Trigger:  PageTrigger(Settings); break;
+    case P_Players:  PageEsp(Settings, Settings->Visuals.Players, "Player ESP", true); break;
+    case P_Bots:     PageEsp(Settings, Settings->Visuals.Bots, "Bot ESP", false); break;
+    case P_Loot:     PageLoot(Settings); break;
+    case P_Radar:    PageRadar(Settings); break;
+    case P_Settings: PageSettings(Settings, ShowMenu); break;
+    case P_Configs:  ConfigsPage(Settings, g_pConfig, cfgname, (int)sizeof cfgname); break;
     }
-
-    //Apply font to all render example
-    static int selectedFontForAll = 0;
-    ImGui::Combo((("Select Font for All")), &selectedFontForAll, Settings->InstalledFonts);
-    if (ImGui::Button((("Apply to All")), { 150, 25 })) {
-        Settings->Visuals.Players.NickName.FontStyle = selectedFontForAll;
-        Settings->Visuals.Players.Weapon.FontStyle = selectedFontForAll;
-        Settings->Visuals.Players.Distance.FontStyle = selectedFontForAll;
-        Settings->Visuals.Players.Status.FontStyle = selectedFontForAll;
-        Settings->Visuals.Players.KDA.FontStyle = selectedFontForAll;
-        Settings->Visuals.Items.FontStyle = selectedFontForAll;
-    }
-
-    CustomStyleColor();
-    if (firstTime) {
-        ImGui::SetNextWindowPos({ (float)300, (float)300 });
-        firstTime = false;
-    }
-    ImGui::SetNextWindowSize(ImVec2(890, 620));
-    ImGui::Begin("Fortnite", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBringToFrontOnFocus);
-    {
-        const auto& p = ImGui::GetWindowPos();
-
-        if (users)
-            ImGui::GetForegroundDrawList()->AddImageRounded(users, ImVec2(p.x + 10, p.y + 50), ImVec2(p.x + 170, p.y + 130), ImVec2(0, 0), ImVec2(1, 1), ImColor(255, 255, 255, 255) /*color*/, 0 /*rounding*/);
-
-        ImGui::SetCursorPos(ImVec2(10, 160));
-        ImGui::BeginGroup();
-        {
-
-            if (ImGui::Tabs(0 == tabs, "F", "Aimbot", ImVec2(90, 40))) {
-                sub_tabs = 0;
-                tabs = 0;
-            }
-
-            if (ImGui::Tabs(1 == tabs, "A", "Visuals", ImVec2(90, 40))) {
-                sub_tabs = 0;
-                tabs = 1;
-            }
-
-            if (ImGui::Tabs(2 == tabs, "N", "World", ImVec2(90, 40)))
-            {
-                sub_tabs = 0;
-                tabs = 2;
-            }
-
-            if (ImGui::Tabs(3 == tabs, "D", "Config", ImVec2(90, 40))) {
-                sub_tabs = 0;
-                tabs = 3;
-            }
-
-
-        }
-        ImGui::EndGroup();
-        if (0 == tabs) {
-            ImGui::SetCursorPos(ImVec2(200, 15));
-            ImGui::BeginGroup();
-            {
-
-                if (ImGui::SubTab(0 == sub_tabs, "Aimbot")) {
-                    sub_tabs = 0;
-                }
-
-                if (ImGui::SubTab(1 == sub_tabs, "Aimbot 2")) {
-                    sub_tabs = 1;
-                }
-
-            }ImGui::EndGroup();
-            if (1 == sub_tabs) {
-                ImGui::SetCursorPos(ImVec2(200, 30));
-                e_elements::begin_child("Misc", ImVec2(335, 500));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 35));
-
-                    ImGui::BeginGroup();
-                    {
-                        ImGui::Text("Switch To Head");  ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(0, (ImGui::GetStyle().ItemSpacing.y * 4.3) - 6)); ImGui::Keybind("Switch To Head", &Settings->Aimbot.SwitchToHeadKey);
-                        ImGui::Text("Hold Key");  ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(0, (ImGui::GetStyle().ItemSpacing.y * 4.3) - 6)); ImGui::Keybind("HoldPrimary", &Settings->Aimbot.HoldPrimaryKey);
-                        ImGui::Text("Alternative Hold Key");  ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(0, (ImGui::GetStyle().ItemSpacing.y * 4.3) - 6)); ImGui::Keybind("Alternative Hold", &Settings->Aimbot.HoldSecondaryKey);
-                    }ImGui::EndGroup();
-
-                }e_elements::end_child();
-                ImGui::SetCursorPos(ImVec2(540, 30));
-                e_elements::begin_child("Settings", ImVec2(335, 500));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 35));
-
-                    ImGui::BeginGroup();
-                    {
-
-                        ImGui::Checkbox("Custom FOV", &Settings->Aimbot.CustomFov);
-                        if (Settings->Aimbot.CustomFov) {
-                            ImGui::SliderFloat("Min. FOV", &Settings->Aimbot.MinFOV, 1, Settings->Aimbot.MaxFOV);
-                            ImGui::SliderFloat("Max. FOV", &Settings->Aimbot.MaxFOV, Settings->Aimbot.MinFOV, 30.f);
-                            ImGui::SliderFloat("Time Coefficient", &Settings->Aimbot.TimeCoefficient, 0.1f, 3.f);
-                            ImGui::SliderFloat("Distance Coefficient", &Settings->Aimbot.DistanceCoefficient, 0.1f, 3.f);
-                        }
-                        else {
-                            ImGui::SliderFloat("FOV", &Settings->Aimbot.MinFOV, 1, 180.f);
-                        }
-                        ImGui::SliderFloat("Smooth", &Settings->Aimbot.Smooth, 1, 30.f);
-                        ImGui::Combo("HitBox", &Settings->Aimbot.HitBox, hitboxes, IM_ARRAYSIZE(hitboxes), IM_ARRAYSIZE(hitboxes));
-                        ImGui::SliderInt("Max. Distance", &Settings->Aimbot.MaxDistance, 1, 1000);
-
-
-                    }ImGui::EndGroup();
-
-                }e_elements::end_child();
-            }
-            else if (0 == sub_tabs) {
-                ImGui::SetCursorPos(ImVec2(200, 30));
-                e_elements::begin_child("General", ImVec2(335, 500));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 35));
-
-                    ImGui::BeginGroup();
-                    {
-
-                        ImGui::BinderBox("0", "Enable", &Settings->Aimbot.Enable, &Settings->Aimbot.ToggleKey);
-                        ImGui::Checkbox("Save Target", &Settings->Aimbot.SaveTarget);
-                        ImGui::Checkbox("Visibility Check", &Settings->Aimbot.VisibilityCheck);
-                        ImGui::Checkbox("Predict", &Settings->Aimbot.Predict);
-                        ImGui::Checkbox("Recoil Control", &Settings->Aimbot.RecoilControl);
-                        ImGui::Checkbox("AimLock (Risky)", &Settings->Aimbot.AimLock);
-                        ImGui::Checkbox("Ignore Knocked", &Settings->Aimbot.IgnoreKnocked);
-                        ImGui::SliderFloat("Target Switch Delay", &Settings->Aimbot.TargetSwitchDelay, 0, 5, "%.1f");
-                    
-                    }ImGui::EndGroup();
-
-                }e_elements::end_child();
-                ImGui::SetCursorPos(ImVec2(540, 30));
-                e_elements::begin_child("Draw", ImVec2(335, 500));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 35));
-
-                    ImGui::BeginGroup();
-                    {
-                        ImGui::CollorBox("##color", "Draw Fov", &Settings->Aimbot.DrawFov, Settings->Aimbot.FovColor, ALPHA);
-                        ImGui::CollorBox("##color2", "Draw CrossHair", &Settings->Aimbot.DrawCrossHair, Settings->Aimbot.CrossHairColor, ALPHA);
-                        ImGui::CollorBox("##color3", "Draw Target", &Settings->Aimbot.DrawTarget, Settings->Aimbot.TargetCollor, ALPHA);
-                        ImGui::Combo("Target Type", &Settings->Aimbot.TargetType, AimTargetTypes, IM_ARRAYSIZE(AimTargetTypes), IM_ARRAYSIZE(AimTargetTypes));
-                        ImGui::SliderFloat("Fov Thickness", &Settings->Aimbot.FovThickness, 1, 5);
-                        ImGui::SliderFloat("CrossHair Thickness", &Settings->Aimbot.CrossHairThickness, 1, 5);
-                        ImGui::SliderFloat("Target Thickness", &Settings->Aimbot.TargetThickness, 1, 5);
-                    }ImGui::EndGroup();
-
-                }e_elements::end_child();
-            }
-        }
-        else if (1 == tabs) {
-            ImGui::SetCursorPos(ImVec2(200, 15));
-            ImGui::BeginGroup();
-            {
-
-                if (ImGui::SubTab(0 == sub_tabs, "Players")) {
-                    sub_tabs = 0;
-                }
-                if (ImGui::SubTab(2 == sub_tabs, "Players 2")) {
-                    sub_tabs = 2;
-                }
-                if (ImGui::SubTab(1 == sub_tabs, "Out Screen")) {
-                    sub_tabs = 1;
-                }
-            }ImGui::EndGroup();
-
-            if (1 == sub_tabs) {
-                ImGui::SetCursorPos(ImVec2(200, 30));
-                e_elements::begin_child("Radar", ImVec2(335, 500));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 35));
-
-                    ImGui::BeginGroup();
-                    {
-                        ImGui::BinderBox("0", "Enable", &Settings->Visuals.Radar.Enable, &Settings->Visuals.Radar.ToggleKey);
-                        if (Settings->Visuals.Radar.Enable) {
-                            ImGui::Combo("Color Type", &Settings->Visuals.Radar.ColorType, "Static\0By Team\0By Visibility\0\0", 3);
-                            if (Settings->Visuals.Radar.ColorType == 2) {
-                                ImGui::Text("Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Visible Color", Settings->Visuals.Radar.VisibleColor, ALPHA);
-                                ImGui::Text("Non Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Non Visible Color", Settings->Visuals.Radar.NonVisibleColor, ALPHA);
-                            }
-                            else if (Settings->Visuals.Radar.ColorType == 1) {
-                                ImGui::SliderInt("Color Alpha", &Settings->Visuals.Radar.TeamColorAlpha, 0, 255);
-                            }
-                            else {
-                                ImGui::Text("Static Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Static Color", Settings->Visuals.Radar.StaticColor, ALPHA);
-                            }
-                            ImGui::SliderInt("Horizontal Pos", &Settings->Visuals.Radar.PositionX, 1, 3000);
-                            ImGui::SliderInt("Vertical Pos", &Settings->Visuals.Radar.PositionY, 1, 3000);
-                            ImGui::SliderInt("Zoom", &Settings->Visuals.Radar.Zoom, 1, 100);
-                            ImGui::SliderInt("Size", &Settings->Visuals.Radar.Size, 50, 500);
-                            ImGui::SliderInt("Max. Distance", &Settings->Visuals.Radar.MaxDistance, 0, 1000);
-                        }
-                    }ImGui::EndGroup();
-
-                }e_elements::end_child();
-                ImGui::SetCursorPos(ImVec2(540, 30));
-                e_elements::begin_child("Out Screen", ImVec2(335, 500));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 35));
-
-                    ImGui::BeginGroup();
-                    {
-                        ImGui::Checkbox("Enable OutScreen", &Settings->Visuals.OutScreen.Enable);
-                        if (Settings->Visuals.OutScreen.Enable) {
-                            const char* OutScreen_items[] = { ("Triangle"), ("Dot") };
-                            ImGui::Combo("Type", &Settings->Visuals.OutScreen.Type, OutScreen_items, IM_ARRAYSIZE(OutScreen_items), IM_ARRAYSIZE(OutScreen_items));
-                            ImGui::Combo("Color Type", &Settings->Visuals.OutScreen.ColorType, "Static\0By Team\0By Visibility\0\0", 3);
-                            if (Settings->Visuals.OutScreen.ColorType == 2) {
-                                ImGui::Text("Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Visible Color##OutVis", Settings->Visuals.OutScreen.VisibleColor, ALPHA);
-                                ImGui::Text("Non Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Non Visible Color##OutNonVis", Settings->Visuals.OutScreen.NonVisibleColor, ALPHA);
-                            }
-                            else if (Settings->Visuals.OutScreen.ColorType == 1) {
-                                ImGui::SliderInt("Team Color Alpha##OutTeam", &Settings->Visuals.OutScreen.TeamColorAlpha, 0, 255);
-                            }
-                            else {
-                                ImGui::Text("Static Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Static Color##OutStatic", Settings->Visuals.OutScreen.StaticColor, ALPHA);
-                            }
-                            ImGui::Keybind("Toggle Key", &Settings->Visuals.OutScreen.ToggleKey);
-                            ImGui::SliderInt("FOV", &Settings->Visuals.OutScreen.Fov, 0, 180);
-                            ImGui::SliderFloat("Thickness", &Settings->Visuals.OutScreen.Thickness, 1, 5);
-                            ImGui::SliderInt("Max. Distance", &Settings->Visuals.OutScreen.MaxDistance, 0, 1000);
-                        }
-                    }ImGui::EndGroup();
-
-                }e_elements::end_child();
-            }
-            else if (2 == sub_tabs) {
-                ImGui::SetCursorPos(ImVec2(200, 10));
-
-                e_elements::begin_child("Features", ImVec2(335, 590));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 25));
-
-                    ImGui::BeginGroup();
-                    {
-                        ImGui::Checkbox("Head Circle", &Settings->Visuals.Players.HeadCircle.Enable);
-                        if (Settings->Visuals.Players.HeadCircle.Enable) {
-                            ImGui::SliderFloat("Size##HeadCircle", &Settings->Visuals.Players.HeadCircle.Size, 1.0f, 10.0f);
-                            ImGui::Combo("Color Type##HeadCircle", &Settings->Visuals.Players.HeadCircle.ColorType, "Static\0By Team\0By Visibility\0\0", 3);
-                            if (Settings->Visuals.Players.HeadCircle.ColorType == 2) {
-                                ImGui::Text("Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Visible Color##HeadVis", Settings->Visuals.Players.HeadCircle.VisibleColor, ALPHA);
-                                ImGui::Text("Non Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Non Visible Color##HeadNonVis", Settings->Visuals.Players.HeadCircle.NonVisibleColor, ALPHA);
-                            }
-                            else if (Settings->Visuals.Players.HeadCircle.ColorType == 1) {
-                                ImGui::SliderInt("Team Color Alpha##HeadTeam", &Settings->Visuals.Players.HeadCircle.TeamColorAlpha, 0, 255);
-                            }
-                        }
-                        ImGui::Separator();
-                        ImGui::CollorBox("##color1", "NickName", &Settings->Visuals.Players.NickName.Enable, Settings->Visuals.Players.NickName.StaticColor, ALPHA);
-                        if (Settings->Visuals.Players.NickName.Enable) {
-                            ImGui::Combo("Position##NickName", &Settings->Visuals.Players.NickName.position, LinesTypes, IM_ARRAYSIZE(LinesTypes), IM_ARRAYSIZE(LinesTypes));
-                            ImGui::Combo("Color Type##NickName", &Settings->Visuals.Players.NickName.ColorType, "Static\0By Team\0By Visibility\0\0", 3);
-                            if (Settings->Visuals.Players.NickName.ColorType == 2) {
-                                ImGui::Text("Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Visible Color##NameVis", Settings->Visuals.Players.NickName.VisibleColor, ALPHA);
-                                ImGui::Text("Non Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Non Visible Color##NameNonVis", Settings->Visuals.Players.NickName.NonVisibleColor, ALPHA);
-                            }
-                            else if (Settings->Visuals.Players.NickName.ColorType == 1) {
-                                ImGui::SliderInt("Team Color Alpha##NameTeam", &Settings->Visuals.Players.NickName.TeamColorAlpha, 0, 255);
-                            }
-                        }
-                    }ImGui::EndGroup();
-
-                }e_elements::end_child();
-
-                ImGui::SetCursorPos(ImVec2(540, 10));
-                e_elements::begin_child("Features", "Features##2", ImVec2(335, 590));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 15));
-
-                    ImGui::BeginGroup();
-                    {
-
-                        ImGui::CollorBox("##color2", "Distance", &Settings->Visuals.Players.Distance.Enable, Settings->Visuals.Players.Distance.StaticColor, ALPHA);
-                        if (Settings->Visuals.Players.Distance.Enable) {
-                            ImGui::Checkbox("Merge With NickName", &Settings->Visuals.Players.Distance.MergeNickName);
-                            ImGui::Combo("Position##Distance", &Settings->Visuals.Players.Distance.position, LinesTypes, IM_ARRAYSIZE(LinesTypes), IM_ARRAYSIZE(LinesTypes));
-                            ImGui::Combo("Color Type##Distance", &Settings->Visuals.Players.Distance.ColorType, "Static\0By Team\0By Visibility\0\0", 3);
-                            if (Settings->Visuals.Players.Distance.ColorType == 2) {
-                                ImGui::Text("Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Visible Color##DistVis", Settings->Visuals.Players.Distance.VisibleColor, ALPHA);
-                                ImGui::Text("Non Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Non Visible Color##DistNonVis", Settings->Visuals.Players.Distance.NonVisibleColor, ALPHA);
-                            }
-                            else if (Settings->Visuals.Players.Distance.ColorType == 1) {
-                                ImGui::SliderInt("Team Color Alpha##DistTeam", &Settings->Visuals.Players.Distance.TeamColorAlpha, 0, 255);
-                            }
-                        }
-                        ImGui::Separator();
-                        ImGui::CollorBox("##color3", "Weapon", &Settings->Visuals.Players.Weapon.Enable, Settings->Visuals.Players.Weapon.StaticColor, ALPHA);
-                        if (Settings->Visuals.Players.Weapon.Enable) {
-                            ImGui::Combo("Position##Weapon", &Settings->Visuals.Players.Weapon.position, LinesTypes, IM_ARRAYSIZE(LinesTypes), IM_ARRAYSIZE(LinesTypes));
-                            ImGui::Combo("Color Type##Weapon", &Settings->Visuals.Players.Weapon.ColorType, "Static\0By Team\0By Visibility\0\0", 3);
-                            if (Settings->Visuals.Players.Weapon.ColorType == 2) {
-                                ImGui::Text("Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Visible Color##WeapVis", Settings->Visuals.Players.Weapon.VisibleColor, ALPHA);
-                                ImGui::Text("Non Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Non Visible Color##WeapNonVis", Settings->Visuals.Players.Weapon.NonVisibleColor, ALPHA);
-                            }
-                            else if (Settings->Visuals.Players.Weapon.ColorType == 1) {
-                                ImGui::SliderInt("Team Color Alpha##WeapTeam", &Settings->Visuals.Players.Weapon.TeamColorAlpha, 0, 255);
-                            }
-                        }
-
-                    }ImGui::EndGroup();
-
-                }e_elements::end_child();
-            }
-            else if (0 == sub_tabs) {
-                ImGui::SetCursorPos(ImVec2(200, 10));
-                e_elements::begin_child("General", ImVec2(335, 240));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 35));
-
-                    ImGui::BeginGroup();
-                    {
-                        ImGui::BinderBox("0", "Enable", &Settings->Visuals.Players.Enable, &Settings->Visuals.Players.ToggleKey);
-                        ImGui::SliderInt("Max. Distance##ESP", &Settings->Visuals.Players.MaxDistance, 0, 1000);
-                        ImGui::SliderFloat("Min. Font Size", &Settings->Visuals.Players.MinFontSize, 10.0f, Settings->Visuals.Players.MaxFontSize, "%.1f");
-                        ImGui::SliderFloat("Max. Font Size", &Settings->Visuals.Players.MaxFontSize, Settings->Visuals.Players.MinFontSize, 30.0f, "%.1f");
-
-                    }ImGui::EndGroup();
-
-                }e_elements::end_child();
-
-
-                ImGui::SetCursorPos(ImVec2(200, 200));
-
-                e_elements::begin_child("Features", ImVec2(335, 370));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 35));
-
-                    ImGui::BeginGroup();
-                    {
-                        ImGui::Checkbox("Box", &Settings->Visuals.Players.Box.Enable);
-                        if (Settings->Visuals.Players.Box.Enable) {
-                            ImGui::Combo("Type##Box", &Settings->Visuals.Players.Box.Type, boxes, IM_ARRAYSIZE(boxes), IM_ARRAYSIZE(boxes));
-                            ImGui::SliderFloat("Thickness##Box", &Settings->Visuals.Players.Box.Thickness, 1.0f, 5.0f, "%.1f");
-                            ImGui::Checkbox("Filled##Box", &Settings->Visuals.Players.Box.Filled);
-                            if (Settings->Visuals.Players.Box.Filled) {
-                                ImGui::Text("Fill Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Fill Color##Box", Settings->Visuals.Players.Box.FillColor, ALPHA);
-                            }
-                            ImGui::Combo("Color Type##Box", &Settings->Visuals.Players.Box.ColorType, "Static\0By Team\0By Visibility\0\0", 3);
-                            if (Settings->Visuals.Players.Box.ColorType == 2) {
-                                ImGui::Text("Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Visible Color##BoxVis", Settings->Visuals.Players.Box.VisibleColor, ALPHA);
-                                ImGui::Text("Non Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Non Visible Color##BoxNonVis", Settings->Visuals.Players.Box.NonVisibleColor, ALPHA);
-                            }
-                            else if (Settings->Visuals.Players.Box.ColorType == 1) {
-                                ImGui::SliderInt("Color Alpha##BoxTeam", &Settings->Visuals.Players.Box.TeamColorAlpha, 0, 255);
-                            }
-                        }
-                    }ImGui::EndGroup();
-
-                }e_elements::end_child();
-
-                ImGui::SetCursorPos(ImVec2(540, 10));
-                e_elements::begin_child("Features", "Features##2", ImVec2(335, 590));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 35));
-
-                    ImGui::BeginGroup();
-                    {
-                        ImGui::Checkbox("Health", &Settings->Visuals.Players.Health.Enable);
-                        if (Settings->Visuals.Players.Health.Enable)
-                        {
-                            ImGui::Combo("Position##Health", &Settings->Visuals.Players.Health.position, HealthTypes, IM_ARRAYSIZE(HealthTypes), 2);
-                            ImGui::SliderFloat("Thickness##Health", &Settings->Visuals.Players.Health.Thickness, 1.0f, 5.0f, "%.1f");
-                            ImGui::SliderInt("Color Alpha##Health", &Settings->Visuals.Players.Health.ColorAlpha, 0, 255);
-                        }
-                        ImGui::Separator();
-                        ImGui::Checkbox("Lines", &Settings->Visuals.Players.Lines.Enable);
-                        if (Settings->Visuals.Players.Lines.Enable) {
-                            ImGui::Combo("Position##Lines", &Settings->Visuals.Players.Lines.Position, LinesTypes, IM_ARRAYSIZE(LinesTypes), IM_ARRAYSIZE(LinesTypes));
-                            ImGui::Combo("Color Type##Lines", &Settings->Visuals.Players.Lines.ColorType, "Static\0By Team\0By Visibility\0\0", 3);
-                            if (Settings->Visuals.Players.Lines.ColorType == 2) {
-                                ImGui::Text("Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Visible Color##LinesVis", Settings->Visuals.Players.Lines.VisibleColor, ALPHA);
-                                ImGui::Text("Non Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Non Visible Color##LinesNonVis", Settings->Visuals.Players.Lines.NonVisibleColor, ALPHA);
-                            }
-                            else if (Settings->Visuals.Players.Lines.ColorType == 1) {
-                                ImGui::SliderInt("Color Alpha##LinesTeam", &Settings->Visuals.Players.Lines.TeamColorAlpha, 0, 255);
-                            }
-                        }
-                        ImGui::Separator();
-                        ImGui::Checkbox("Skeleton", &Settings->Visuals.Players.Skeleton.Enable);
-                        if (Settings->Visuals.Players.Skeleton.Enable) {
-                            ImGui::SliderFloat("Thickness##Skeleton", &Settings->Visuals.Players.Skeleton.Thickness, 1.0f, 5.0f, "%.1f");
-                            ImGui::Combo("Color Type##Skeleton", &Settings->Visuals.Players.Skeleton.ColorType, "Static\0By Team\0By Visibility\0\0", 3);
-                            if (Settings->Visuals.Players.Skeleton.ColorType == 2) {
-                                ImGui::Text("Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Visible Color##SkelVis", Settings->Visuals.Players.Skeleton.VisibleColor, ALPHA);
-                                ImGui::Text("Non Visible Color");
-                                ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(-294, (ImGui::GetStyle().ItemSpacing.y * 3.5) - 6));
-
-                                ImGui::ColorEdit4("Non Visible Color##SkelNonVis", Settings->Visuals.Players.Skeleton.NonVisibleColor, ALPHA);
-                            }
-                            else if (Settings->Visuals.Players.Skeleton.ColorType == 1) {
-                                ImGui::SliderInt("Color Alpha##SkelTeam", &Settings->Visuals.Players.Skeleton.TeamColorAlpha, 0, 255);
-                            }
-                        }
-
-                    }ImGui::EndGroup();
-
-                }e_elements::end_child();
-            }
-        }
-        else if (2 == tabs)
-        {
-            ImGui::SetCursorPos(ImVec2(200, 15));
-            ImGui::BeginGroup();
-            {
-                if (ImGui::SubTab(0 == sub_tabs, "Config"))
-                {
-                    sub_tabs = 0;
-                }
-                if (ImGui::SubTab(1 == sub_tabs, "Weapons"))
-                {
-                    sub_tabs = 1;
-                }
-                if (ImGui::SubTab(2 == sub_tabs, "World"))
-                {
-                    sub_tabs = 2;
-                }
-            }
-            ImGui::EndGroup();
-
-            if (0 == sub_tabs) {
-                ImGui::SetCursorPos(ImVec2(200, 20));
-                ImGuiWindow* window = ImGui::GetCurrentWindow();
-                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 11));
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(16, 16));
-                e_elements::begin_child(window->GetID("World##1"), ImVec2(335, 600));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 35));
-
-                    ImGui::BeginGroup();
-                    {
-                        
-                    }
-                    ImGui::EndGroup();
-                }
-                e_elements::end_child();
-            }
-            if (1 == sub_tabs) {
-                ImGui::SetCursorPos(ImVec2(200, 20));
-                ImGuiWindow* window = ImGui::GetCurrentWindow();
-                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 11));
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(16, 16));
-                e_elements::begin_child(window->GetID("World##1"), ImVec2(335, 600));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 35));
-
-                    ImGui::BeginGroup();
-                    {
-                        
-
-                    }
-                    ImGui::EndGroup();
-                }
-                e_elements::end_child();
-                ImGui::SetCursorPos(ImVec2(540, 20));
-                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 11));
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(16, 16));
-                e_elements::begin_child(window->GetID("World##2"), ImVec2(335, 600));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 35));
-
-                    ImGui::BeginGroup();
-                    {
-                        
-                    }
-                    ImGui::EndGroup();
-                }
-                e_elements::end_child();
-            }
-            if (2 == sub_tabs) {
-                ImGui::SetCursorPos(ImVec2(200, 20));
-                ImGuiWindow* window = ImGui::GetCurrentWindow();
-                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 11));
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(16, 16));
-                e_elements::begin_child(window->GetID("World##1"), ImVec2(335, 600));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 35));
-
-                    ImGui::BeginGroup();
-                    {
-                        
-                    }
-                    ImGui::EndGroup();
-                }
-                e_elements::end_child();
-                ImGui::SetCursorPos(ImVec2(540, 20));
-                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 11));
-                ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(16, 16));
-                e_elements::begin_child(window->GetID("World##2"), ImVec2(335, 600));
-                {
-                    ImGui::SetCursorPos(ImVec2(10, 35));
-
-                    ImGui::BeginGroup();
-                    {
-                        
-                    }
-                    ImGui::EndGroup();
-                }
-                e_elements::end_child();
-            }
-        }
-
-        else if (3 == tabs) {
-            ImGui::SetCursorPos(ImVec2(200, 15));
-            ImGui::BeginGroup();
-            {
-
-                if (ImGui::SubTab(0 == sub_tabs, "Config")) {
-                    sub_tabs = 0;
-                }
-            }ImGui::EndGroup();
-
-            ImGui::SetCursorPos(ImVec2(200, 30));
-            ImGuiWindow* window = ImGui::GetCurrentWindow();
-            e_elements::begin_child("Config", ImVec2(535, 580));
-            {
-                ImGui::SetCursorPos(ImVec2(10, 45));
-
-                ImGui::BeginGroup();
-                {
-                    ImGui::SliderInt("Render FPS", &Settings->Configs.RenderFPS, 30, 1000);
-                    ImGui::Checkbox("Spectator Count", &Settings->Configs.SpectatorCount);
-
-                    ImGui::Text("Menu Key");
-                    ImGui::SetCursorPos(ImGui::GetCursorPos() - ImVec2(0, (ImGui::GetStyle().ItemSpacing.y * 5) - 6));
-                    ImGui::Keybind("Menu", &Settings->Configs.MenuKey);
-
-
-                    ImGui::SetCursorPos(ImGui::GetCursorPos() + ImVec2(0, (ImGui::GetStyle().ItemSpacing.y * 2.5) - 6));
-
-                    if (ImGui::Combo("Select Your Config", &Settings->iConfig, g_pConfig->szConfigs.c_str())) {
-                        if (Settings->oldiConfig != Settings->iConfig) {
-                            g_pConfig->InitPath(&g_pConfig->vecConfigs[Settings->oldiConfig][0u]);
-                            g_pConfig->Save();
-                            Settings->oldiConfig = Settings->iConfig;
-                            g_pConfig->InitPath(&g_pConfig->vecConfigs[Settings->iConfig][0u]);
-                            g_pConfig->Read();
-                        }
-                    }
-
-
-                    ImGui::Text("New Config:");
-                    ImGui::InputText("Config Name", cfgname, 30);
-                    if (ImGui::Button("Add Config")) {
-                        g_pConfig->CreateConfig(cfgname);
-                    }
-
-                }ImGui::EndGroup();
-
-            }e_elements::end_child();
-        }
-    } ImGui::End();
+    EndShell();
 }
 #endif

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Standalone preview exe for the custom menu.
+  Compiles the same GUI/ImGui sources and main.cpp as MenuCustomization.vcxproj,
+  plus DebugMain.cpp as a fake "loader" window. Nothing here affects the DLL build.
+  Build + run: powershell -ExecutionPolicy Bypass -File Preview\preview.ps1 [-Game PUBG]
+-->
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{8f3c2a71-5d4e-4b9a-9c61-2e7d0f4a6b13}</ProjectGuid>
+    <RootNamespace>MenuPreview</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>$(DefaultPlatformToolset)</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <!-- MenuGame / GameDefines are passed by preview.ps1 -Game; empty = use the defaults in Config.h -->
+  <PropertyGroup>
+    <MenuGame Condition="'$(MenuGame)'==''">Default</MenuGame>
+    <OutDir>$(MSBuildThisFileDirectory)bin\$(Configuration)\$(MenuGame)\</OutDir>
+    <IntDir>$(MSBuildThisFileDirectory)obj\$(Configuration)\$(MenuGame)\</IntDir>
+    <TargetName>MenuPreview</TargetName>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level1</WarningLevel>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <!-- shim first so GUI.cpp picks up the d3dx11.h stand-in -->
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)shim;$(MSBuildThisFileDirectory)..\MenuCustomization;$(MSBuildThisFileDirectory)..\MenuCustomization\Imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <!-- GameDefines arrives '+'-separated from preview.ps1 (Unescape so the ';' splits the list) -->
+      <PreprocessorDefinitions>$([MSBuild]::Unescape($(GameDefines.Replace('+', ';'))));MENU_PREVIEW;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <!-- main.cpp has #pragma comment(lib, "d3dx11.lib"); the preview doesn't need the legacy DX SDK -->
+      <IgnoreSpecificDefaultLibraries>d3dx11.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <!-- Keep this list in sync with MenuCustomization.vcxproj -->
+  <ItemGroup>
+    <ClCompile Include="..\MenuCustomization\DebugMain.cpp" />
+    <ClCompile Include="..\MenuCustomization\main.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\custom.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\etc_element.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\GUI.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\Games\Apex.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\Games\Arc.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\Games\BO7Ext.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\Games\BO7Int.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\Games\Fortnite.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\Games\MarvelRivals.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\Games\MW19.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\Games\MW3BO6.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\Games\PUBG.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\Games\R6.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\Games\Rust.cpp" />
+    <ClCompile Include="..\MenuCustomization\GUI\Games\WarDogs.cpp" />
+    <ClCompile Include="..\MenuCustomization\Imgui\imgui.cpp" />
+    <ClCompile Include="..\MenuCustomization\Imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\MenuCustomization\Imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="..\MenuCustomization\Imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="..\MenuCustomization\Imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\MenuCustomization\Imgui\imgui_widgets.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="shim\d3dx11.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

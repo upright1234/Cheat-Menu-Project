@@ -7,83 +7,445 @@
 #include "../etc_element.h"
 
 #if IsFortnite
-float animation_ = 0.0f;
-
-#define ALPHA (ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_NoDragDrop | ImGuiColorEditFlags_PickerHueBar)
-#define NO_ALPHA (ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_NoDragDrop | ImGuiColorEditFlags_PickerHueBar)
+#include "../MenuKit.h"
+using namespace kit;
 
 char cfgname[30] = "NewSetting";
-int selectedItem = 0;
-bool firstTime = true;
+
+namespace {
+
+const char* const kWeapons[]       = { "Shotgun", "SMG", "Pistol", "Bolt", "Sniper", "Rifle", "Others" };
+const char* const kHitBoxes[]      = { "Head", "Chest", "Body", "Random" };
+const char* const kPositions[]     = { "Top", "Bottom", "Left", "Right" };
+const char* const kTopBottom[]     = { "Top", "Bottom" };
+const char* const kBoxStyles[]     = { "Square", "Corner" };
+const char* const kTargetShapes[]  = { "Circle", "Triangle" };
+const char* const kRarities[]      = { "All", "Uncommon", "Rare", "Epic", "Legendary" };
+constexpr int kWeaponCount = IM_ARRAYSIZE(kWeapons);
+
+enum Page { P_Aimbot, P_Players, P_Labels, P_Loot, P_Radar, P_Settings, P_Configs, P_Count };
+
+const char* const kSections[] = { "COMBAT", "VISUALS", "SYSTEM" };
+const NavItem kPages[P_Count] = {
+    { "Aimbot",   "Targeting, triggerbot, FOV and aim overlays", 0 },
+    { "Players",  "Boxes, skeletons, lines and alerts",          1 },
+    { "Labels",   "Name, weapon, rank and other player text",    1 },
+    { "Loot",     "Chests, weapons, ammo and supply drops",      1 },
+    { "Radar",    "Mini radar and off-screen indicators",        1 },
+    { "Settings", "Menu key, performance and fonts",             2 },
+    { "Configs",  "Save, load and create presets",               2 },
+};
+
+// Opens a panel for a player label (name / weapon / distance ...); caller adds extras and calls EndPanel()
+template <typename T>
+void BeginLabelPanel(const char* title, T& label, const std::vector<std::string>& fonts) {
+    BeginPanel(title);
+    ImGui::Checkbox("Enable", &label.Enable);
+    if (label.Enable) {
+        ComboRow("Position", &label.position, kPositions, IM_ARRAYSIZE(kPositions));
+        ComboRow("Font", &label.FontStyle, fonts);
+        ColorMode(label);
+    }
+}
+
+void PageAimbot(SETTINGS* s) {
+    BeginPanel("Profile", ImGui::GetContentRegionAvail().x);
+    {
+        ImGui::Checkbox("Per-weapon profiles", &s->Aim.ByWeapon);
+        if (s->Aim.ByWeapon) {
+            ImGui::SameLine(RightEdge() - kComboW - ImGui::CalcTextSize("Editing").x - 10.f);
+            ImGui::PushStyleColor(ImGuiCol_Text, kColDim);
+            Label("Editing");
+            ImGui::PopStyleColor();
+            ImGui::SameLine(RightEdge() - kComboW);
+            ImGui::SetNextItemWidth(kComboW + 60.f);
+            ImGui::Combo("##weapon", &s->selectedWeapon, kWeapons, kWeaponCount, kWeaponCount);
+        } else {
+            const char* note = "Editing the global profile";
+            ImGui::SameLine(RightEdge() - ImGui::CalcTextSize(note).x);
+            ImGui::PushStyleColor(ImGuiCol_Text, kColDim);
+            Label(note);
+            ImGui::PopStyleColor();
+        }
+    }
+    EndPanel();
+
+    SETTINGS::AimStruct& aim = s->Aim.ByWeapon ? s->aimbot[s->selectedWeapon] : s->Aim;
+    ImGui::PushID(&aim); // keeps widget state separate per profile
+
+    BeginColumns();
+    BeginPanel("Aimbot");
+    {
+        ImGui::Checkbox("Enable", &aim.Enable);
+        KeyRow("Toggle Key", &aim.ToggleKey);
+        KeyRow("Aim Key", &aim.HoldPrimaryKey);
+        KeyRow("Secondary Key", &aim.HoldSecondaryKey);
+        KeyRow("Switch To Head", &aim.SwitchToHeadKey);
+        ComboRow("Hitbox", &aim.HitBox, kHitBoxes, IM_ARRAYSIZE(kHitBoxes));
+        SliderF("Smoothing", &aim.Smooth, 1.f, 10.f);
+        SliderI("Max Distance", &aim.MaxDistance, 1, 1000, "%d m");
+    }
+    EndPanel();
+
+    BeginPanel("Behavior");
+    {
+        ImGui::Checkbox("Visibility Check", &aim.VisibilityCheck);
+        ImGui::Checkbox("Ignore Knocked", &aim.IgnoreKnocked);
+        ImGui::Checkbox("Ignore Bots", &aim.IgnoreBots);
+        ImGui::Checkbox("Only With Weapon", &aim.WeaponOnly);
+        ImGui::Checkbox("Predict Movement", &aim.Predict);
+        ImGui::Checkbox("Memory Aim", &aim.MemoryAim);
+        ImGui::Checkbox("Aim Lock", &aim.AimLock);
+    }
+    EndPanel();
+
+    BeginPanel("Triggerbot");
+    {
+        ToggleKey("Enable", &aim.TriggerBot, &aim.TriggerKey);
+        if (aim.TriggerBot) {
+            SliderF("Delay", &aim.TriggerDelay, 0.f, 1.f, "%.2f s");
+            SliderI("Max Distance", &aim.TriggerMaxDistance, 1, 1000, "%d m");
+        }
+    }
+    EndPanel();
+
+    NextColumn();
+    BeginPanel("Field of View");
+    {
+        SliderF("Min FOV", &aim.MinFOV, 1.f, aim.MaxFOV, "%.0f");
+        SliderF("Max FOV", &aim.MaxFOV, aim.MinFOV, 180.f, "%.0f");
+        ImGui::Checkbox("Dynamic FOV", &aim.CustomFov);
+        if (aim.CustomFov) {
+            SliderF("Distance Coefficient", &aim.DistanceCoefficient, 0.f, 3.f, "%.2f");
+            SliderF("Time Coefficient", &aim.TimeCoefficient, 0.f, 3.f, "%.2f");
+        }
+        SubHeader("Circle");
+        ToggleColor("Draw FOV", &aim.DrawFov, aim.FovColor);
+        if (aim.DrawFov)
+            SliderF("Thickness", &aim.FovThickness, 1.f, 5.f);
+    }
+    EndPanel();
+
+    BeginPanel("Target Switching");
+    {
+        ImGui::Checkbox("Keep Target", &aim.SaveTarget);
+        if (aim.SaveTarget)
+            SliderF("Target Switch Delay", &aim.TargetSwitchDelay, 0.f, 5.f, "%.1f s");
+        ImGui::Checkbox("Dead Zone", &aim.DeadZone);
+        if (aim.DeadZone)
+            SliderF("Dead Zone Radius", &aim.DeadZoneRadius, 1.f, 20.f);
+    }
+    EndPanel();
+
+    BeginPanel("Target Indicator");
+    {
+        ToggleColor("Draw Target", &aim.DrawTarget, aim.TargetCollor);
+        if (aim.DrawTarget) {
+            ComboRow("Shape", &aim.TargetType, kTargetShapes, IM_ARRAYSIZE(kTargetShapes));
+            SliderF("Thickness", &aim.TargetThickness, 1.f, 5.f);
+        }
+    }
+    EndPanel();
+
+    BeginPanel("Crosshair");
+    {
+        ToggleColor("Draw Crosshair", &aim.DrawCrossHair, aim.CrossHairColor);
+        if (aim.DrawCrossHair)
+            SliderF("Thickness", &aim.CrossHairThickness, 1.f, 5.f);
+    }
+    EndPanel();
+    EndColumns();
+
+    ImGui::PopID();
+}
+
+void PagePlayers(SETTINGS* s) {
+    auto& p = s->Visuals.Players;
+    BeginColumns();
+    BeginPanel("Player ESP");
+    {
+        ImGui::Checkbox("Enable", &p.Enable);
+        KeyRow("Toggle Key", &p.ToggleKey);
+        SliderI("Max Distance", &p.MaxDistance, 1, 1000, "%d m");
+        SliderF("Min Font Size", &p.MinFontSize, 10.f, p.MaxFontSize, "%.0f px");
+        SliderF("Max Font Size", &p.MaxFontSize, p.MinFontSize, 30.f, "%.0f px");
+        ImGui::Checkbox("Fade With Distance", &p.DistanceTransparency);
+        if (p.DistanceTransparency) {
+            SliderF("Min Opacity", &p.MinTransparency, 0.f, p.MaxTransparency, "%.2f");
+            SliderF("Max Opacity", &p.MaxTransparency, p.MinTransparency, 1.f, "%.2f");
+        }
+    }
+    EndPanel();
+
+    BeginPanel("Box");
+    {
+        auto& box = p.Box;
+        ImGui::Checkbox("Enable", &box.Enable);
+        if (box.Enable) {
+            ComboRow("Style", &box.Type, kBoxStyles, IM_ARRAYSIZE(kBoxStyles));
+            SliderF("Width", &box.Width, 0.1f, 1.f, "%.2f");
+            SliderF("Thickness", &box.Thickness, 1.f, 5.f);
+            SliderI("Rounding", &box.rounding, 1, 20);
+            ToggleColor("Filled", &box.Filled, box.FillColor);
+            ColorMode(box);
+        }
+    }
+    EndPanel();
+
+    BeginPanel("Skeleton");
+    {
+        ImGui::Checkbox("Enable", &p.Skeleton.Enable);
+        if (p.Skeleton.Enable) {
+            SliderF("Thickness", &p.Skeleton.Thickness, 1.f, 5.f, "%.2f");
+            ColorMode(p.Skeleton);
+        }
+    }
+    EndPanel();
+
+    BeginPanel("Snaplines");
+    {
+        auto& lines = p.Lines;
+        ImGui::Checkbox("Enable", &lines.Enable);
+        if (lines.Enable) {
+            ComboRow("Origin", &lines.Position, kTopBottom, IM_ARRAYSIZE(kTopBottom));
+            SliderF("Thickness", &lines.Thickness, 1.f, 5.f);
+            ColorMode(lines);
+        }
+    }
+    EndPanel();
+
+    NextColumn();
+    BeginPanel("Head Circle");
+    {
+        auto& head = p.HeadCircle;
+        ImGui::Checkbox("Enable", &head.Enable);
+        if (head.Enable) {
+            SliderF("Size", &head.Size, 1.f, 10.f);
+            SliderF("Thickness", &head.Thickness, 1.f, 5.f);
+            ImGui::Checkbox("Filled", &head.Filled);
+            ColorMode(head);
+        }
+    }
+    EndPanel();
+
+    BeginPanel("Prediction Lines");
+    {
+        auto& pl = p.PredictionLines;
+        ImGui::Checkbox("Enable", &pl.Enable);
+        if (pl.Enable) {
+            SliderF("Prediction Time", &pl.PredictionTime, 0.5f, 5.f, "%.1f s");
+            SliderF("Length", &pl.Length, 10.f, 200.f, "%.0f");
+            SliderF("Thickness", &pl.Thickness, 1.f, 5.f);
+            SliderF("Min Velocity", &pl.MinVelocity, 1.f, 20.f);
+            ImGui::Checkbox("End Point", &pl.ShowEndPoint);
+            if (pl.ShowEndPoint)
+                SliderF("End Point Size", &pl.EndPointSize, 1.f, 10.f);
+            ColorMode(pl);
+        }
+    }
+    EndPanel();
+
+    BeginPanel("Proximity Alert");
+    {
+        auto& prox = p.ProximityAlerts;
+        ImGui::Checkbox("Enable", &prox.Enable);
+        if (prox.Enable) {
+            SliderF("Radius", &prox.ProximityRadius, 10.f, 200.f, "%.0f m");
+            ImGui::Checkbox("Pulsing Border", &prox.PulsatingBorder);
+            if (prox.PulsatingBorder)
+                SliderF("Border Thickness", &prox.BorderThickness, 1.f, 5.f);
+            ImGui::Checkbox("Warning Text", &prox.ProximityText);
+            if (prox.ProximityText)
+                SliderF("Text Size", &prox.TextSize, 10.f, 50.f, "%.0f px");
+            ColorRow("Alert Color", prox.AlertColor);
+            ColorRow("Text Color", prox.TextColor);
+        }
+    }
+    EndPanel();
+    EndColumns();
+}
+
+void PageLabels(SETTINGS* s) {
+    auto& p = s->Visuals.Players;
+    const auto& fonts = s->InstalledFonts;
+    BeginColumns();
+    BeginLabelPanel("Name", p.NickName, fonts);
+    EndPanel();
+
+    BeginLabelPanel("Weapon", p.Weapon, fonts);
+    EndPanel();
+
+    BeginLabelPanel("Distance", p.Distance, fonts);
+    if (p.Distance.Enable)
+        ImGui::Checkbox("Merge With Name", &p.Distance.MergeNickName);
+    EndPanel();
+
+    NextColumn();
+    BeginLabelPanel("Status", p.Status, fonts);
+    EndPanel();
+
+    BeginLabelPanel("Rank", p.Rank, fonts);
+    EndPanel();
+
+    BeginLabelPanel("Platform", p.Platform, fonts);
+    EndPanel();
+
+    BeginLabelPanel("Kills", p.Kills, fonts);
+    EndPanel();
+
+    BeginLabelPanel("Velocity", p.Velocity, fonts);
+    EndPanel();
+    EndColumns();
+}
+
+void PageLoot(SETTINGS* s) {
+    auto& it = s->Visuals.Items;
+    BeginColumns();
+    BeginPanel("Loot ESP");
+    {
+        ImGui::Checkbox("Enable", &it.Enable);
+        KeyRow("Toggle Key", &it.ToggleKey);
+        SliderI("Max Distance", &it.MaxDistance, 1, 1000, "%d m");
+        SliderF("Min Font Size", &it.MinFontSize, 10.f, it.MaxFontSize, "%.0f px");
+        SliderF("Max Font Size", &it.MaxFontSize, it.MinFontSize, 30.f, "%.0f px");
+        ComboRow("Font", &it.FontStyle, s->InstalledFonts);
+    }
+    EndPanel();
+
+    NextColumn();
+    BeginPanel("Sources");
+    {
+        ImGui::Checkbox("Chests", &it.Chest);
+        ImGui::Checkbox("Supply Drops", &it.SupplyDrop);
+        ImGui::Checkbox("Vehicles", &it.Vehicle);
+        ImGui::Checkbox("Weapons", &it.Weapon);
+        ImGui::Checkbox("Ammo", &it.Ammo);
+        ImGui::Checkbox("Consumables", &it.Consumable);
+        ImGui::Checkbox("Materials", &it.Material);
+        ComboRow("Min Rarity", &it.Rarity, kRarities, IM_ARRAYSIZE(kRarities));
+    }
+    EndPanel();
+    EndColumns();
+}
+
+void PageRadar(SETTINGS* s) {
+    BeginColumns();
+    BeginPanel("Radar");
+    {
+        auto& r = s->Visuals.Radar;
+        ToggleKey("Enable", &r.Enable, &r.ToggleKey);
+        if (r.Enable) {
+            SliderI("Size", &r.Size, 50, 500, "%d px");
+            SliderI("Zoom", &r.Zoom, 1, 100);
+            SliderI("Max Distance", &r.MaxDistance, 1, 1000, "%d m");
+            SliderI("Position X", &r.PositionX, 0, 3000);
+            SliderI("Position Y", &r.PositionY, 0, 3000);
+            SubHeader("Markers");
+            SliderF("Min Size", &r.MinSize, 1.f, r.MaxSize);
+            SliderF("Max Size", &r.MaxSize, r.MinSize, 6.f);
+            SliderF("Min Opacity", &r.MinOpacity, 0.f, r.MaxOpacity, "%.2f");
+            SliderF("Max Opacity", &r.MaxOpacity, r.MinOpacity, 1.f, "%.2f");
+            ColorMode(r);
+        }
+    }
+    EndPanel();
+
+    NextColumn();
+    BeginPanel("Off-screen Indicators");
+    {
+        auto& o = s->Visuals.OutScreen;
+        ToggleKey("Enable", &o.Enable, &o.ToggleKey);
+        if (o.Enable) {
+            ComboRow("Style", &o.Type, kTargetShapes, IM_ARRAYSIZE(kTargetShapes));
+            SliderI("FOV", &o.Fov, 1, 180);
+            SliderI("Max Distance", &o.MaxDistance, 1, 1000, "%d m");
+            SliderF("Thickness", &o.Thickness, 1.f, 5.f);
+            SliderF("Min Size", &o.MinSize, 1.f, o.MaxSize, "%.0f px");
+            SliderF("Max Size", &o.MaxSize, o.MinSize, 30.f, "%.0f px");
+            SliderF("Min Opacity", &o.MinOpacity, 0.f, o.MaxOpacity, "%.2f");
+            SliderF("Max Opacity", &o.MaxOpacity, o.MinOpacity, 1.f, "%.2f");
+            ColorMode(o);
+        }
+    }
+    EndPanel();
+    EndColumns();
+}
+
+void PageSettings(SETTINGS* s, bool* ShowMenu) {
+    auto& c = s->Configs;
+    BeginColumns();
+    BeginPanel("Menu");
+    {
+        KeyRow("Menu Key", &c.MenuKey);
+        ImGui::Checkbox("Feature Descriptions", &c.FeaturesDefinition);
+        if (ActionButton("##hide", "Hide Menu"))
+            *ShowMenu = false;
+    }
+    EndPanel();
+
+    BeginPanel("Performance");
+    {
+        ImGui::Checkbox("VSync", &c.VSync);
+        SliderI("Render FPS", &c.RenderFPS, 30, 360);
+        SliderI("Game FPS", &c.GameFPS, 30, 240);
+    }
+    EndPanel();
+
+    NextColumn();
+    FontsPanel(s, [s](int font) {
+        auto& p = s->Visuals.Players;
+        p.NickName.FontStyle = font;
+        p.Weapon.FontStyle = font;
+        p.Distance.FontStyle = font;
+        p.Rank.FontStyle = font;
+        p.Platform.FontStyle = font;
+        p.Kills.FontStyle = font;
+        p.Status.FontStyle = font;
+        p.Velocity.FontStyle = font;
+        s->Visuals.Items.FontStyle = font;
+    });
+    EndColumns();
+}
+
+} // namespace
+
 void RenderMyMenu(bool* ShowMenu, SETTINGS* Settings, CConfig* g_pConfig) {
-
-    //example force disable option
-    Settings->Aim.SmoothInterpolation = false;
-
-    if (!ShowMenu)
+    MENU_LOG_FRAME(ShowMenu, Settings, g_pConfig);
+    if (!ShowMenu || !Settings)
         return;
-    
-    std::vector<std::string> BoxTypes = { ("Square"), ("Corner") };
-    std::vector<std::string> WeaponTypes = { ("Shotgun"), ("SMG"), ("Pistol"), ("Bolt"), ("Sniper"), ("Rifle") , ("Others") };
-    std::vector<std::string> AimTargetTypes = { ("Circle"), ("Triangle") };
-    std::vector<std::string> ColorTypes = { ("Static"), ("By Team"), ("By Visible") };
-    std::vector<std::string> PositionTypes = { ("Top"), ("Bottom"), ("Left"), ("Right") };
-    std::vector<std::string> PositionMinTypes = { ("Top"), ("Bottom") };
-    std::vector<std::string> DrawFormatTypes = { ("Circle"), ("Triangle") };
-    std::vector<std::string> VehicleTypes = { ("Road"), ("Sailing") };
-    std::vector<std::string> hitboxes = { ("Head"), ("Chest"), ("Body"), ("Random") };
-    std::vector<std::string> RarityTypes = { ("All"), ("Uncommon"), ("Rare"), ("Epic"), ("Legendary") };
 
-    //Install font example
-    static int selectedSystemFont = 0;
-    ImGui::Combo((("Available System Fonts")), &selectedSystemFont, Settings->AvailableFonts);
-    if (ImGui::Button((("Load Font")), { 100, 25 })) {
-        if (selectedSystemFont >= 0 && selectedSystemFont < Settings->AvailableFonts.size()) {
-            std::string fontName = Settings->AvailableFonts[selectedSystemFont];
-            if (std::find(Settings->InstalledFonts.begin(), Settings->InstalledFonts.end(), fontName) == Settings->InstalledFonts.end()) {
-                Settings->InstalledFonts.push_back(fontName);
-            }
-        }
+    if (Settings->selectedWeapon < 0 || Settings->selectedWeapon >= kWeaponCount)
+        Settings->selectedWeapon = 0;
+
+    SETTINGS::AimStruct& aim = Settings->Aim.ByWeapon ? Settings->aimbot[Settings->selectedWeapon] : Settings->Aim;
+
+    const Chip chips[] = {
+        { "AIM",   &aim.Enable },
+        { "ESP",   &Settings->Visuals.Players.Enable },
+        { "LOOT",  &Settings->Visuals.Items.Enable },
+        { "RADAR", &Settings->Visuals.Radar.Enable },
+    };
+
+    ShellDesc desc;
+    desc.brand = "FORTNITE";
+    desc.sections = kSections;
+    desc.pages = kPages;
+    desc.pageCount = P_Count;
+    desc.chips = chips;
+    desc.chipCount = IM_ARRAYSIZE(chips);
+    desc.menuKey = Settings->Configs.MenuKey;
+
+    static int page = P_Aimbot;
+    BeginShell(desc, page, ShowMenu);
+    switch (page) {
+    case P_Aimbot:   PageAimbot(Settings); break;
+    case P_Players:  PagePlayers(Settings); break;
+    case P_Labels:   PageLabels(Settings); break;
+    case P_Loot:     PageLoot(Settings); break;
+    case P_Radar:    PageRadar(Settings); break;
+    case P_Settings: PageSettings(Settings, ShowMenu); break;
+    case P_Configs:  ConfigsPage(Settings, g_pConfig, cfgname, (int)sizeof cfgname); break;
     }
-
-    //Apply font to all render example
-    static int selectedFontForAll = 0;
-    ImGui::Combo((("Select Font for All")), &selectedFontForAll, Settings->InstalledFonts);
-    if (ImGui::Button((("Apply to All")), { 150, 25 })) {
-        Settings->Visuals.Players.NickName.FontStyle = selectedFontForAll;
-        Settings->Visuals.Players.Weapon.FontStyle = selectedFontForAll;
-        Settings->Visuals.Players.Distance.FontStyle = selectedFontForAll;
-        Settings->Visuals.Players.Status.FontStyle = selectedFontForAll;
-        Settings->Visuals.Players.Velocity.FontStyle = selectedFontForAll;
-        Settings->Visuals.Items.FontStyle = selectedFontForAll;
-    }
-
-    //Config By Weapon example
-    ImGui::BeginGroup();
-    {
-        ImGui::Checkbox("Configuration By Weapon", &Settings->Aim.ByWeapon);
-        if (Settings->Aim.ByWeapon) {
-            ImGui::Combo("Weapon", &Settings->selectedWeapon, WeaponTypes, IM_ARRAYSIZE(WeaponTypes), IM_ARRAYSIZE(WeaponTypes));
-        }
-    }ImGui::EndGroup();
-
-    //Config selector example
-    ImGui::BeginGroup();
-    {
-        if (ImGui::Combo("Select Your Config", &Settings->iConfig, g_pConfig->szConfigs.c_str())) {
-            if (Settings->oldiConfig != Settings->iConfig) {
-                g_pConfig->InitPath(&g_pConfig->vecConfigs[Settings->oldiConfig][0u]);
-                g_pConfig->Save();
-                Settings->oldiConfig = Settings->iConfig;
-                g_pConfig->InitPath(&g_pConfig->vecConfigs[Settings->iConfig][0u]);
-                g_pConfig->Read();
-            }
-        }
-        ImGui::InputText("Config Name", cfgname, 30);
-        if (ImGui::Button("Add Config")) {
-            g_pConfig->CreateConfig(cfgname);
-        }
-
-    }ImGui::EndGroup();
+    EndShell();
 }
 #endif

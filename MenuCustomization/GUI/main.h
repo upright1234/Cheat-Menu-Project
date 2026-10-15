@@ -21,8 +21,10 @@ inline void CustomStyleColor()
 }
 
 inline ID3D11ShaderResourceView* users = nullptr;
+inline ID3D11ShaderResourceView* Logo_Texture = nullptr; // header logo, created from LogoData.h in InitMyMenu
 inline ImFont* Main_Font = nullptr;
 inline ImFont* Font1 = nullptr;
+inline ImFont* Title_Font = nullptr; // Main_Font at a larger size, for menu headings
 inline ImFont* ico = nullptr;
 inline ImFont* icons = nullptr;
 #define ALPHA    ( ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_Float | ImGuiColorEditFlags_NoDragDrop | ImGuiColorEditFlags_PickerHueBar | ImGuiColorEditFlags_NoBorder )

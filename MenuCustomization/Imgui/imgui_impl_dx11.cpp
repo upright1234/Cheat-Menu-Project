@@ -32,6 +32,7 @@
 
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
+#include "../GUI/DebugLog.h" // diagnostic logging only; a no-op unless built with /DMENU_DEBUG_LOG=1
 
 // DirectX
 #include <stdio.h>
@@ -567,6 +568,19 @@ bool    ImGui_ImplDX11_Init(ID3D11Device* device, ID3D11DeviceContext* device_co
     if (pDXGIAdapter) pDXGIAdapter->Release();
     bd->pd3dDevice->AddRef();
     bd->pd3dDeviceContext->AddRef();
+
+#if MENU_DEBUG_LOG
+    // This is the last statement of InitializeMenu (main.cpp), which has no `return true` on its success path.
+    // Once this function is inlined there, the loader receives whatever is left in the return register: the
+    // AddRef above, i.e. the context's reference count. Only its low byte is read, so a count that is a
+    // multiple of 256 reads back as "init failed". AddRef/Release here just reads that same count back.
+    {
+        bd->pd3dDeviceContext->AddRef();
+        const ULONG ctxRefs = bd->pd3dDeviceContext->Release();
+        MENU_LOG("ImGui_ImplDX11_Init: done, InitializeMenu complete; context refcount %lu -> loader reads init as %s",
+            ctxRefs, (ctxRefs & 0xFF) ? "SUCCESS" : "FAILURE (refcount low byte is 0)");
+    }
+#endif
 
     return true;
 }
